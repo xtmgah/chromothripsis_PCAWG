@@ -13,5 +13,6 @@
 - New docker images will be built, tagged, and pushed to: [docker hub](https://hub.docker.com/r/scottx611x/chromothripsis-pcawg/) if a PR or TAG are noticed.
 
 ### To-Do:
-- [ ] Run docker behind apache
-- [ ] Auto deploy to compbio
+- [ ] Local development docs
+- [ ] Run docker behind Apache on compbio
+- [ ] Auto deploy to compbio on `master` updates
