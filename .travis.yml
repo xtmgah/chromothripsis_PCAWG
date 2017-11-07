@@ -3,7 +3,7 @@ sudo: required
 
 script:
   # build new docker images on push
-  - sudo ./build_image.sh
+  - sudo sh build_image.sh
 
 after_success:
   - REPO=scottx611x/chromothripsis-pcawg
