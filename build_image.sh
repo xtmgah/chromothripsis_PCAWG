@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-REPO=scottx611x/chromothripsis-PCAWG
+REPO=scottx611x/chromothripsis-pcawg
 
 export STAMP=`date +"%Y-%m-%d_%H-%M-%S"`
 
