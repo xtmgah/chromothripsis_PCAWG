@@ -1,0 +1,24 @@
+# Docker on Travis requires sudo.
+sudo: required
+
+after_success:
+  - REPO=scottx611x/chromothripsis-pcawg
+  - IMAGE=`sudo docker ps --latest --format '{{ .Image }}'` # TODO: with more containers, can't rely on ordering
+  - tag_push() { echo "Tagging into $2"; sudo docker tag $1 $2; sudo docker push $2; }
+
+  - sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
+  # Always update "latest": the cache will be used for the next build.
+  - tag_push $IMAGE $REPO
+  - >
+      if [ "$TRAVIS_EVENT_TYPE" == "pull_request" ]; then
+        echo "PR!";
+        BRANCH=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} | perl -pne 'chomp;s{.*/}{};s/\W/-/g'`;
+        tag_push $IMAGE $REPO:$BRANCH;
+        tag_push $IMAGE $REPO:latest-pr;
+      fi
+  - >
+      if [ ! -z "$TRAVIS_TAG" ]; then
+        echo "Git tag!";
+        tag_push $IMAGE $REPO:$TRAVIS_TAG;
+        tag_push $IMAGE $REPO:latest;
+      fi
