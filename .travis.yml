@@ -1,6 +1,10 @@
 # Docker on Travis requires sudo.
 sudo: required
 
+script:
+  # build new docker images on push
+  - sudo ./build_image.sh
+
 after_success:
   - REPO=scottx611x/chromothripsis-pcawg
   - IMAGE=`sudo docker ps --latest --format '{{ .Image }}'` # TODO: with more containers, can't rely on ordering
