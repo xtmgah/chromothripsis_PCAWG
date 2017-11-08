@@ -38,6 +38,7 @@
     + `sudo docker run --rm -d -p 80:3242 -v /var/log/chromothripsis_pcawg_logs/:/var/log/shiny-server/ scottx611x/chromothripsis-pcawg`
 
 ### To-Do:
+- [ ] Basic tests ( `/` -> `200`)
 - [ ] Local development docs
 - [x] Deployment Docs
 - [ ] Auto deploy new images to AWS on `master` updates
