@@ -14,7 +14,7 @@
 
 ### Deployment:
 - AWS t2.micro instance free tier
-- Deployed to: https://compbio.med.harvard.edu/chromothripsis
+- Deployed to: http://compbio.med.harvard.edu/chromothripsis
 - Compbio providing http/ws proxy in `/etc/apache2/sites-available/compbio.med.harvard.edu.conf` to AWS instance:
 - Apache proxy conf.
 ```
