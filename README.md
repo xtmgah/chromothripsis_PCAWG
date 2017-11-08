@@ -40,4 +40,4 @@
 ### To-Do:
 - [ ] Local development docs
 - [x] Deployment Docs
-- [ ] Auto deploy to compbio on `master` updates
+- [ ] Auto deploy new images to AWS on `master` updates
