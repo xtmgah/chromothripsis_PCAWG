@@ -3,6 +3,7 @@ sudo: required
 
 script:
   # build new docker images on push
+  - sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
   - sudo sh build_image.sh
 
 after_success:
@@ -10,7 +11,6 @@ after_success:
   - IMAGE=`sudo docker ps --latest --format '{{ .Image }}'` # TODO: with more containers, can't rely on ordering
   - tag_push() { echo "Tagging into $2"; sudo docker tag $1 $2; sudo docker push $2; }
 
-  - sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
   # Always update "latest": the cache will be used for the next build.
   - tag_push $IMAGE $REPO
   - >
