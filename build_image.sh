@@ -10,8 +10,6 @@ echo "image-$STAMP"
 CONTAINER_NAME="container-$STAMP$SUFFIX"
 mkdir "/tmp/$CONTAINER_NAME"
 
-sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
-
 docker pull $REPO # Defaults to "latest", but just speeds up the build, so precise version doesn't matter.
 docker build --cache-from $REPO \
              --tag image-$STAMP \
