@@ -11,7 +11,7 @@
 
 ### Local Development:
 - Make your edits to the application code
-- Run `./build_image.sh` -> you should get a docker image ID in the console if things built properly
+- Run `sudo sh build_image.sh` -> you should get a docker image ID in the console if things built properly
 - `docker run -p 3242:3242 <IMAGE_ID>`
 - Open http://localhost:3242 and poke around the app
 - If you're satisfied with the changes either tag your current commit or create a pull request
