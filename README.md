@@ -47,4 +47,5 @@
 - [ ] Basic tests ( `/` -> `200`)
 - [x] Local development docs
 - [x] Deployment Docs
+- [ ] `-v app/:/srv/shinyapps/app`
 - [ ] Auto deploy new images to AWS on `master` updates
