@@ -28,15 +28,15 @@
 ```
    RewriteEngine on
    RewriteCond %{HTTP:Upgrade} =websocket
-   RewriteRule /chromothripsis/(.*) ws://54.209.186.16/$1 [P,L]
+   RewriteRule /chromothripsis/(.*) ws://<host>/$1 [P,L]
    RewriteCond %{HTTP:Upgrade} !=websocket
-   RewriteRule /chromothripsis/(.*) http://54.209.186.16/$1 [P,L]
+   RewriteRule /chromothripsis/(.*) http://<host>/$1 [P,L]
    RewriteRule /chromothripsis http://compbio.med.harvard.edu/chromothripsis/
    ProxyPreserveHost On
-   ProxyPass /chromothripsis http://54.209.186.16/
-   ProxyPassMatch ^/chromothripsis$ http://54.209.186.16
-   ProxyPassMatch ^/chromothripsis/(.*)$ http://54.209.186.16/$1
-   ProxyPassReverse /chromothripsis http://54.209.186.16
+   ProxyPass /chromothripsis http://<host>/
+   ProxyPassMatch ^/chromothripsis$ http://<host>
+   ProxyPassMatch ^/chromothripsis/(.*)$ http://<host>/$1
+   ProxyPassReverse /chromothripsis http://<host>
    SetEnv force-proxy-request-1.0 1
    SetEnv proxy-nokeepalive 1
 ```  
