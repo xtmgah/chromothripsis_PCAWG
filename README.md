@@ -25,7 +25,7 @@
 - Compbio providing http/ws proxy in `/etc/apache2/sites-available/compbio.med.harvard.edu.conf` to AWS instance:
 - Apache Proxy Config:
 ```
-   Define chromothripsis_host ec2-34-205-69-77.compute-1.amazonaws.com
+   Define chromothripsis_host <hostname>
    RewriteEngine on
    RewriteCond %{HTTP:Upgrade} =websocket
    RewriteRule /chromothripsis/(.*) ws://${chromothripsis_host}/$1 [P,L]
