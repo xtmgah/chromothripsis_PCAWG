@@ -41,14 +41,15 @@
 ##
 ###print(head(d))
 
-calls_all = readRDS("calls_all_with_all_info.rds")
+calls_all = readRDS("calls_all_with_all_info_server.rds")
+#calls_all = readRDS("calls_all_with_all_info.rds")
 d = calls_all
 d$SV_sample = d['SV calls file']
 d$SV_sample = as.vector(unlist(d$SV_sample))
 d$CNV = d['SCNA calls file']
 d$CNV = as.vector(unlist(d$CNV))
 
-names(d)[which(names(d) == "stage_backup")] = "tumor_stage"
+#names(d)[which(names(d) == "stage_backup")] = "tumor_stage"
 #names(d)[3] = "Start coordinate for SV cluster in chr"
 #names(d)[4] = "End coordinate for SV cluster in chr"
 #names(d)[5] = "Nb. intrachromosomal SVs"

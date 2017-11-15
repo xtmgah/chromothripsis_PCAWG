@@ -1,11 +1,9 @@
 library(ggplot2)
-#library(DT)
+library(DT)
 
 function(input, output, session) {
-#d= readRDS("calls_all_with_all_info.rds")
-source("load_data.R")
 
-  
+source("load_data.R")
 
 output$myImage <- renderImage(deleteFile = FALSE,{
   # Return a list containing the filename
@@ -150,7 +148,6 @@ out = out[match(ordered,out$Chr),]
 chs = out$Chr
 out$Chr = NULL
 out = data.frame(t(out)) #[,2:ncol(out)]))
-#print(chs)
 colnames(out) = chs
 
 
@@ -160,32 +157,12 @@ colnames(out) = chs
 
   
   output$plot1 <- renderPlot({
-#     palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
-#               "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
-#     
-#     par(mar = c(5.1, 4.1, 0, 1))
-#     plot(selectedData(),
-#          col = clusters()$cluster,
-#          pch = 20, cex = 3)
-#     points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
-    #ggplot(selectedData(),aes(Start,End)) + geom_point()
-    source("circos.R")  ##_chromoanasynthesis_40e17bf8.R")
-    #plot(1,1)
+    source("circos.R")
     })
-
-output$test <- renderPlot({plot(1,1)})
-
-## table
-#print( t(selectedData()[1,1:5]))
-#pepe = selectedData()
-#pp = data.frame(t(pepe))
-#names(pp) = rownames(pepe)
-#print(pepe)
-#output$table1 <-  DT::renderDataTable(pepe)
 
 
 output$donor_choice <- renderUI({
-  selectInput('donor', 'Donor ID', unique(d$donor_unique_id[which(d$histo == input$cancer_type)]))
+  selectInput('donor', 'Donor ID', sort(unique(d$donor_unique_id[which(d$histo == input$cancer_type)])))
 })
 
 
@@ -261,9 +238,9 @@ output$plot_chromo <- renderPlot({
   gp2 <- ggplotGrob(pp[[2]]+ theme(plot.margin=unit(c(0,1,0,0), "cm"),axis.text.x=element_blank()))
   gp3 <- ggplotGrob(pp[[3]] + theme(plot.margin=unit(c(0,1,0,0), "cm"),legend.position="none")+theme(axis.text.x=element_blank()))
   gp4 <- ggplotGrob(pp[[4]] + theme(plot.margin=unit(c(0,1,0,0), "cm"),legend.position="none"))
-  gp1$widths <- gp2$widths
-  gp3$widths <- gp2$widths
-  gp4$widths <- gp2$widths
+  gp1$widths <- gp3$widths
+  gp2$widths <- gp3$widths
+  gp4$widths <- gp3$widths
   pp = grid.arrange(gp1,gp2,gp3,gp4,nrow=4,ncol=1,heights=c(0.1,.45,.4,.2)) 
 #  pp = arrangeGrob(gp1,gp2,gp3,gp4,nrow=4,ncol=1,heights=c(0.2,.4,.55,.25)) 
   print(pp)

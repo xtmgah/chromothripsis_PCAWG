@@ -221,7 +221,7 @@ if (max(CNVsnow$log2copyratio,na.rm=T) <=10){
             scale_x_continuous(expand = c(0.01,0.01),labels = function(x){paste(x/1000000,"MB")})
             CNV_plot = CNV_plot + scale_y_continuous(minor_breaks = NULL,breaks=c(0,sort(unique(CNVsnow$log2copyratio))),
                                                      limits=c(min(CNVsnow$log2copyratio) -0.35,max(CNVsnow$log2copyratio,na.rm=T)+.35)) + 
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 
 if (max(CNVsnow$log2copyratio,na.rm=T) <=100 & max(CNVsnow$log2copyratio,na.rm=T) >10){
@@ -248,7 +248,7 @@ if (max(CNVsnow$log2copyratio,na.rm=T) <=100 & max(CNVsnow$log2copyratio,na.rm=T
                                                  limits=c( -.01 + log(min(CNVsnow$log2copyratio),base=2), 
                                                           log(max(CNVsnow$log2copyratio,na.rm=T) , base=2)+.01 ), 
                                                  labels=as.character(mm)) +
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 
 if (max(CNVsnow$log2copyratio,na.rm=T) >100){
@@ -263,7 +263,7 @@ if (max(CNVsnow$log2copyratio,na.rm=T) >100){
                                                  limits=c( log(min(CNVsnow$log2copyratio),base=10), 
                                                           log(max(CNVsnow$log2copyratio,na.rm=T) , base=10)), 
                                                  labels=as.character(mm)) +
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 
 #################################
@@ -287,7 +287,7 @@ if (max(CNVsnow2$log2copyratio,na.rm=T) <=10){
             scale_x_continuous(expand = c(0.01,0.01),labels = function(x){paste(x/1000000,"MB")}) #X,limits=c(min_coord,max_coord))
             CNV_plot_minor = CNV_plot_minor + scale_y_continuous(minor_breaks = NULL,breaks=c(0,sort(unique(CNVsnow2$log2copyratio))),
                                                                  limits=c(min(CNVsnow2$log2copyratio) -0.35,max(CNVsnow2$log2copyratio,na.rm=T)+.35)) + 
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 
 if (max(CNVsnow2$log2copyratio,na.rm=T) <=100 & max(CNVsnow2$log2copyratio,na.rm=T) >10){
@@ -314,7 +314,7 @@ if (max(CNVsnow2$log2copyratio,na.rm=T) <=100 & max(CNVsnow2$log2copyratio,na.rm
                                                              limits=c( -.01 + log(min(CNVsnow2$log2copyratio),base=2), 
                                                                       log(max(CNVsnow2$log2copyratio,na.rm=T) , base=2)+.01 ), 
                                                              labels=as.character(mm)) +
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 
 if (max(CNVsnow2$log2copyratio,na.rm=T) >100){
@@ -330,7 +330,7 @@ if (max(CNVsnow2$log2copyratio,na.rm=T) >100){
                                                              limits=c( log(min(CNVsnow2$log2copyratio),base=10), 
                                                                       log(max(CNVsnow2$log2copyratio,na.rm=T) , base=10)), 
                                                              labels=as.character(mm)) +
-coord_cartesian(xlim=c(min_coord,max_coord))
+coord_cartesian(xlim=c(min_coord,max_coord),expand = c(0.01,0.01))
 }
 # expre plot
 #  
@@ -430,10 +430,12 @@ p = p +
 p = p +ylim(0,4)
 p = p + annotate(geom = "text",x = (chr_info_annot$start+chr_info_annot$end)/2,y=chr_info_annot$y + 1.3,
                  label=chr_info_annot$name, vjust=.5, angle=90,size=5,hjust=.5)
-p = p +theme_bw() + common_ggplot2_chrom + #xlim(min_coord,max_coord) + 
-    #scale_x_continuous(limits = c(min_coord,max_coord),expand = c(0.01,0.01)) +
-  #coord_cartesian(xlim=c(min_coord, max_coord),expand = c(0.01,0.01))
-scale_x_continuous(expand = c(0.01,0.01), limits=c(min_coord,max_coord))
+p = p + theme_bw() + common_ggplot2_chrom +
+	#xlim(min_coord,max_coord) + 
+  scale_x_continuous(#limits = c(min_coord,max_coord),
+					 expand = c(0.01,0.01)) +
+coord_cartesian(xlim=c(min_coord, max_coord),expand = c(0.01,0.01))
+#scale_x_continuous(expand = c(0.01,0.01), limits=c(min_coord,max_coord))
 
 
 p$layout$clip[p$layout$name=="panel"] <- "off"
