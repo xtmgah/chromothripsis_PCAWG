@@ -271,7 +271,8 @@ This project has received funding from the European Union’s Framework Programm
 the Marie Curie Sklodowska-Curie Grant Agreement No. 703543 (I.C.C.).
 </h3>
  </div>
-     <hr><p style="text-align: center;font-family: Vollkorn;"> This site was designed by Isidro Cortes-Ciriano (isidrolauscher@gmail.com)</p><br></br><br></br>')
+     <hr><p style="text-align: center;font-family: Vollkorn;"> This site was designed by Isidro Cortes-Ciriano (isidrolauscher@gmail.com)</p>
+     <p style="text-align: center;font-family: Vollkorn;"> Shiny App deployment by <a href="https://github.com/scottx611x">Scott Ouellette</a></p><br></br><br></br>')
   
 
 )
