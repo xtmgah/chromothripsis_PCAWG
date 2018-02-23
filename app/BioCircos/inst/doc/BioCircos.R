@@ -8,18 +8,21 @@
 #  devtools::install_github('lvulliard/BioCircos.R', build_vignettes = TRUE)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 BioCircos()
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 BioCircos(genome = "hg19", yChr = FALSE, genomeFillColor = "Reds", chrPad = 0, 
   displayGenomeBorder = FALSE, genomeTicksDisplay = FALSE, genomeLabelDy = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 myGenome = list("A" = 10560,
         "B" = 8808,
@@ -32,7 +35,8 @@ BioCircos(genome = myGenome, genomeFillColor = c("tomato2", "darkblue"),
   genomeTicksScale = 4e+3)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 tracklist = BioCircosTextTrack('myTextTrack', 'Some text', size = "2em", opacity = 0.5, 
   x = -0.67, y = -0.5)
@@ -43,7 +47,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
   genomeLabelTextSize = "9pt", genomeLabelDy = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 tracklist = BioCircosBackgroundTrack("myBackgroundTrack", minRadius = 0.5, maxRadius = 0.8,
   borderColors = "#AAAAAA", borderSize = 0.6, fillColors = "#FFBBBB")  
@@ -53,7 +58,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
   genomeTicksDisplay = FALSE,  genomeLabelTextSize = "9pt", genomeLabelDy = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Chromosomes on which the points should be displayed
 points_chromosomes = c('X', '2', '7', '13', '9')
@@ -76,7 +82,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
   genomeTicksDisplay = FALSE,  genomeLabelTextSize = 18, genomeLabelDy = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 arcs_chromosomes = c('X', 'X', '2', '9') # Chromosomes on which the arcs should be displayed
 arcs_begin = c(1, 45270560, 140253678, 20484611)
@@ -90,7 +97,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
   genomeTicksDisplay = FALSE,  genomeLabelTextSize = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 links_chromosomes_1 = c('X', '2', '9') # Chromosomes on which the links should start
 links_chromosomes_2 = c('3', '18', '9') # Chromosomes on which the links should end
@@ -111,7 +119,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
   genomeTicksDisplay = FALSE,  genomeLabelTextSize = "8pt", genomeLabelDy = 0)
 
 ## ----figBarTrack, fig.width=4, fig.height=4, fig.align = 'center'--------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 library(RColorBrewer)
 library(grDevices)
 
@@ -140,7 +149,8 @@ BioCircos(tracks, genomeFillColor = "YlOrBr", genome = as.list(lengthChr),
   genomeTicksDisplay = F, genomeLabelDy = 0)
 
 ## ----figCNVTrack---------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Arcs coordinates
 snvChr = rep(4:9, 3)
@@ -160,7 +170,8 @@ tracks = tracks + BioCircosBackgroundTrack("arcs_background", colors = "#2222EE"
 BioCircos(tracks, genomeFillColor = "YlOrBr", genomeTicksDisplay = F, genomeLabelDy = 0)
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Define a custom genome
 genomeChr = LETTERS[1:10]
@@ -196,7 +207,8 @@ BioCircos(tracks, chrPad = 0.05, displayGenomeBorder = FALSE, LINEMouseOutDispla
   LINEMouseOverTooltipsHtml01 = "Pretty lines<br/>This tooltip won't go away!")
 
 ## ------------------------------------------------------------------------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Create a tracklist with a text annotation and backgrounds
 tracklist = BioCircosTextTrack('t1', 'hi')
@@ -206,7 +218,8 @@ tracklist = tracklist + BioCircosBackgroundTrack('b1')
 BioCircos(tracklist - 't1')
 
 ## ----figMultiTrack, fig.width=5, fig.height=5, fig.align = 'center'------
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Fix random generation for reproducibility
 set.seed(3)

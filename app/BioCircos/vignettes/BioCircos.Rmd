@@ -61,7 +61,8 @@ To produce a BioCircos visualization, you need to call the *BioCircos* method, t
 By default, an empty *tracklist* is used, and the genome is automatically set to use the chromosome sizes of the reference genome hg19 (GRCh37).
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 BioCircos()
 ```
@@ -73,7 +74,8 @@ For now, the only pre-configured genome available is *hg19* (GRCh37), for which 
 The ticks, displaying the scale on each chromosome, can be removed with *genomeTicksDisplay*, and the genome labels (chromosome names) can be brought closer or further away from the chromosomes with *genomeLabelDy*.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 BioCircos(genome = "hg19", yChr = FALSE, genomeFillColor = "Reds", chrPad = 0, 
   displayGenomeBorder = FALSE, genomeTicksDisplay = FALSE, genomeLabelDy = 0)
@@ -83,7 +85,8 @@ To use your own reference genome, you need to define a named list of chromosomal
 You may want to change the scale of the ticks on the chromosomes, to fit to your reference genome, with the *genomeTickScale* parameters.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 myGenome = list("A" = 10560,
         "B" = 8808,
@@ -110,7 +113,8 @@ A first track simply corresponds to text annotations. The obligatory parameters 
 Some parameters such as the size, the opacity and the coordinates can be customized.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 tracklist = BioCircosTextTrack('myTextTrack', 'Some text', size = "2em", opacity = 0.5, 
   x = -0.67, y = -0.5)
@@ -127,7 +131,8 @@ BioCircos(tracklist, genomeFillColor = "PuOr",
 Another simple track type correspond to backgrounds, displayed under other tracks, in a given radius interval.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 tracklist = BioCircosBackgroundTrack("myBackgroundTrack", minRadius = 0.5, maxRadius = 0.8,
   borderColors = "#AAAAAA", borderSize = 0.6, fillColors = "#FFBBBB")  
@@ -144,7 +149,8 @@ It is therefore needed to specify the chromosome and coordinates where each poin
 By default, points display a tooltip when hovered by the mouse.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Chromosomes on which the points should be displayed
 points_chromosomes = c('X', '2', '7', '13', '9')
@@ -173,7 +179,8 @@ Arc tracks are displaying arcs along the genomic circle, between the radii given
 By default, arcs display a tooltip when hovered by the mouse.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 arcs_chromosomes = c('X', 'X', '2', '9') # Chromosomes on which the arcs should be displayed
 arcs_begin = c(1, 45270560, 140253678, 20484611)
@@ -193,7 +200,8 @@ Links track represent links between different genomic position. They are display
 By default, links display a tooltip when hovered by the mouse.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 links_chromosomes_1 = c('X', '2', '9') # Chromosomes on which the links should start
 links_chromosomes_2 = c('3', '18', '9') # Chromosomes on which the links should end
@@ -221,7 +229,8 @@ By default, the radial range of the track will stretch from the minimal to the m
 Here, to add a track to the tracklist at each iteration of the loop, we initialize the *tracks* tracklist with an empty *BioCircosTracklist* object.
 
 ```{r figBarTrack, fig.width=4, fig.height=4, fig.align = 'center'}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 library(RColorBrewer)
 library(grDevices)
 
@@ -256,7 +265,8 @@ Conceptually close to bar tracks, and commonly used for purposes such as represe
 The start and end coordinates of each arc, as well as the associated value need to be specified.  
 
 ```{r figCNVTrack}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Arcs coordinates
 snvChr = rep(4:9, 3)
@@ -283,7 +293,8 @@ For a given genome stretch, heatmaps associate linearly numerical values with a 
 For two-dimensional heatmaps, you can stack up *heatmap tracks*, as done in the following example.  
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Define a custom genome
 genomeChr = LETTERS[1:10]
@@ -332,7 +343,8 @@ BioCircos(tracks, chrPad = 0.05, displayGenomeBorder = FALSE, LINEMouseOutDispla
 Tracks can be removed from a track list by substracting the name of the corresponding track.
 
 ```{r}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Create a tracklist with a text annotation and backgrounds
 tracklist = BioCircosTextTrack('t1', 'hi')
@@ -348,7 +360,8 @@ BioCircos(tracklist - 't1')
 You can combine and overlap as many tracks as you want. 
 
 ```{r figMultiTrack, fig.width=5, fig.height=5, fig.align = 'center'}
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 
 # Fix random generation for reproducibility
 set.seed(3)

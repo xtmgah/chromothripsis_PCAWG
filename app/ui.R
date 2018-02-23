@@ -3,7 +3,8 @@ library(gridExtra)
 library(plyr)
 library(reshape)
 library(DT)
-library(BioCircos)
+# load package w/o installing
+dev_tools::load_all('/srv/shinyapps/app/BioCircos')
 source("load_data.R")
 d$Chr = d$chrom
 library(shinythemes)
