@@ -1,0 +1,135 @@
+<head>
+  <meta charset="UTF-8">
+  
+<link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+
+
+  
+</head>
+
+<body>
+<div class="wrapper" style="border-color:#000000; border-width:thick; font-family: 'Open Sans';">
+
+	<div class="header2">
+		<!-- <h1 class="header__title">Welcome to Chromothripsis Explorer</h1> -->
+		<h1 class="header__title" style="font-family: Cookie; color: #5383d3; font-size: 60px;">Chromothripsis <span>Explorer</span></h1>
+		<h4 class="header__subtitle"></h4>
+	</div>
+
+	<div class="cards">
+
+		<div class=" card [ is-collapsed ] ">
+			<div class="card__inner [ js-expander ]">
+				<span>Whole-genome sequencing data</span>
+				<i class="fa fa-database"></i> 
+			</div>
+			<div class="card__expander">
+				<i class="fa fa-close [ js-collapser ]"></i>
+				Chromothripsis refers to the genomic alterations characterized by massive de novo rearrangements, often generated in a single catastrophic event, where the DNA is shattered into a number of fragments that are subsequently stitched together in random order and orientation.			
+				In our recent publication (Cortes-Ciriano et al, 2018), we have characterized the rates of chromothripsis across 37 cancer types using whole-genome sequencing data from ~2,600 tumors that were uniformly collected and processed under the auspices of the Pan-Cancer Analysis of Whole Genomes (PCAWG) project.
+	
+				<br></br>
+				The main focus of this site is the exploration of the chromothripsis events we detected in this tumor cohort
+				using the chromothripsis detection tool we developed ad hoc (i.e. ShatterSeek).
+				<!-- Howee also provide functionalities to explore  additionsome features of this tumor cohort (e.g., tumor ploidy and purity), -->
+				<br></br>
+
+				Please cite our paper if you find this site or the associated data useful (Cortes-Ciriano et al, 2018).
+				Please browse the tab "Supplementary Information" in the navigation bar
+				to download the Supplementary Information and the R package ShatterSeek.  
+				<br></br>
+				<!-- More information about the consortium can be found <span> <a style="display: inline" href="http://pancancer.info/">here</a> </span>. -->
+			</div>
+		</div>
+
+		<div class=" card [ is-collapsed ] ">
+			<div class="card__inner [ js-expander ]">
+				<span>Chromothripsis explorer</span>
+				<i class="fa  fa-bar-chart"></i>
+			</div>
+			<div class="card__expander">
+				<i class="fa fa-close [ js-collapser ]"></i>
+				Chromothripsis Explorer permits to explore and visualize the tumors comprised in the PCAWG cohort,
+				including properties of the tumors (e.g. purity and ploidy),
+				as well as interactive circos plots for all tumors reporting the SNV, indel, structural variation, and the
+				total and minor copy number profiles for chromosomes 1-22 and X.
+				These plots permit to easily visualize complex mutational profiles (e.g. chromothripsis and kataegis),
+				deletions of chromosome arms, LOH regions, etc..
+				<br></br>
+				Please see below for specific instructions for each visualization tool.
+				To facilitate the integration with the results of other PCAWG studies,
+				we have used in this site and in our publication the cancer type abbreviations and the colour schemes
+				agreed upon by the PCAWG consortium.
+				<!-- the descriptions below for each specific plot. -->
+				<br></br>
+				<!-- Select a set of cancer types below to explore the percentage of tumors 
+				harboring chromothripsis events satisfying multiple features:
+				(i) a minimum values for a set of properties,
+				(ii) minimum number of uninterrupted copy number (CN) oscillations, number of breakpoints in the region, 
+				and (iii) the number of chromosomes in the tumor affected by chromothripsis.
+				 <br></br>
+				The features of each chromothripsis region can be further explored in a bubble plot that reports the relationship between the 
+				fraction of structural variations (SVs) involved in chromothripsis in a given chromosome  with respect to the total number of SVs detected in that tumor, 
+				and the number of uninterrupted CN oscillations.
+				Hover over the bubbles for additional information and to identify the tumors and regions of interest.
+
+				 <br></br>
+				Finally, we provide interactive circos plots for all tumors reporting the SNVs, indels, structural rearrangements, and 
+				total and minor copy number profiles for chromosomes 1-22 and X. -->
+			</div>
+		</div>
+
+		<div class=" card [ is-collapsed ] ">
+			<div class="card__inner [ js-expander ]">
+				<span>Chromothripsis detection</span>
+				<i class="fa fa-gears"></i>
+			</div>
+			<div class="card__expander">
+				<i class="fa fa-close [ js-collapser ]"></i>
+
+                To identify chromothripsis-like patterns from whole-genome sequencing data we developed the R package ShatterSeek,
+				which consists of a custom algorithm to detect clusters of SVs,
+				and a set of statistical criteria partly based on the work of Korbel and Campbell (Cell, 2013).
+                Given that chromothripsis events generate clusters 
+                of interleaved rearrangements (i.e., the genomic regions bridged by their breakpoints overlap but are not nested), 
+                ShatterSeek firstly scans each chromosome in each cancer genome for the presence of clusters of this type.
+                To find clusters, ShatterSeek constructs an undirected graph whose nodes correspond to SVs and whose 
+                edges connect interleaved SVs. 
+				Thus, clusters of SVs are detected by finding the connected components in the graph. 
+                The connected component in each chromosome with the highest number of SVs is considered for further analysis. 
+				<!-- We confined our analyses to the entire mappable genome with the exception of chromosome Y. -->
+                <br></br>
+                Once the SV clusters are detected, several statistical criteria are evaluated.
+				<!-- we tested whether the distribution of DNA fragment joints (i.e., duplication-like, deletion-like, 
+                head-to-head and tail-to-tail inversions) diverged from a multinomial distribution with equal probabilities for each category 
+                using the goodness-of-fit test for the multinomial distribution (chiq.test function from the R package stats), as described by 
+                Korbel and Campbell (fragment joints test). In addition, we used the binomial test corrected for 
+                mappability to evaluate the enrichment of SVs in each chromosome (chromosomal enrichment test). We also evaluated whether the 
+                distribution of breakpoints differed from an exponential distribution as described by Korbel and Campbell 
+                (exponential distribution of breakpoints test). 
+				<br></br> -->
+                In addition, the genomic regions delimited by the distal breakpoints composing 
+                the SV clusters are further examined for the presence of contiguous genomic segments oscillating between two CN states
+				(a widely acknowledged hallmark of chromothripsis). 
+                To tune the parameters in our method, we used statistical thresholds and visual inspection. 
+                For the minimum number of oscillating CN segments, we used two thresholds:
+                <br></br>
+                - High-confidence calls display uninterrupted oscillations between two states in at least 7 adjacent segments
+				<br></br>
+                - Low-confidence calls involved between 4 and 6 uninterrupted CN oscillations 
+                <br></br>
+                Our chromothripsis calls were further classified into "canonical" if at least 60% of the CN segments in the complex rearrangement oscillate between 
+                2 states, and "with other complex events" in cases where chromothripsis co-localizes with other genomic alterations.
+				Interchromosomal SVs were used to detect chromothripsis events involving multiple chromosomes.
+				<!-- Finally, we visually inspected all candidate chromothripsis events that satisfied the statistical criteria described above. -->
+                <br></br>
+				The ShatterSeek code, a tutorial and the documentation are publicly available (please see the 'Supplementary Information' tab).
+				Please read our publication or the ShatterSeek tutorial for more details on the methodology and its validation.
+				<br></br>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</body>
