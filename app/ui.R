@@ -3,8 +3,8 @@ library(gridExtra)
 library(plyr)
 library(reshape)
 library(DT)
-# load package w/o installing
-dev_tools::load_all('/srv/shinyapps/app/BioCircos')
+
+library(BioCircos)
 source("load_data.R")
 d$Chr = d$chrom
 library(shinythemes)
@@ -47,9 +47,7 @@ shinyUI(
           #    ),
 
           #hidden(div(id="app-content",
-               navbarPage(title=div("Chromothipsis in human cancers",responsive = T,
-                          style="background-colour:#000000;font-style:'Open Sans'; ", 
-                          class="w3-bar w3-light-grey w3-border", tags$a(class="w3-bar-item w3-button w3-black w3-large")),
+               navbarPage(title="Chromothipsis in human cancers"),
                     tabPanel(title=div(style="font-size: 30px;",icon("home")),
                              
                              ## embargo information
