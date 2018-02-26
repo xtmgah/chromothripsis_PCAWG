@@ -47,7 +47,7 @@ shinyUI(
           #    ),
 
           #hidden(div(id="app-content",
-               navbarPage(title="Chromothipsis in human cancers"),
+               navbarPage(title="Chromothipsis in human cancers",
                     tabPanel(title=div(style="font-size: 30px;",icon("home")),
                              
                              ## embargo information
