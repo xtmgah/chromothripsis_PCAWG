@@ -13,5 +13,7 @@ RUN R -e "devtools::install_github('jcheng5/googleCharts')"
 
 COPY app/ /srv/shinyapps/app
 
+RUN R CMD INSTALL /srv/shinyapps/app/dist/BioCircos.tar.gz
+
 EXPOSE 3242
 CMD ["R", "-e", "shiny::runApp('/srv/shinyapps/app', 3242, host='0.0.0.0')"]
