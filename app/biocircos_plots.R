@@ -1,5 +1,5 @@
-# load package w/o installing
-dev_tools::load_all('/srv/shinyapps/app/BioCircos')
+
+library(BioCircos)
 nucle = c("A","C","G","T")
 nucle= expand.grid(nucle,nucle)
 nucle = nucle[which(nucle$Var1 != nucle$Var2),]

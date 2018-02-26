@@ -1,7 +1,7 @@
 library(ggplot2)
 library(DT)
-# load package w/o installing
-dev_tools::load_all('/srv/shinyapps/app/BioCircos')
+
+library(BioCircos)
 source("biocircos_plots.R")
 colours_ICGC= read.table("ICGC_colours_2.txt",sep="\t",header=F,stringsAsFactors = F,comment.char="")
 d$colour_ICGC = colours_ICGC$V2[match(d$histo,colours_ICGC$V1)]
