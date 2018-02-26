@@ -6,7 +6,6 @@
 - [docker](https://docs.docker.com/engine/installation/)
 
 ### Running the app:
-- `docker pull scottx611x/chromothripsis-pcawg`
 - `docker run -p 3242:3242 scottx611x/chromothripsis-pcawg`
 - open http://localhost:3242
 - Voila!
