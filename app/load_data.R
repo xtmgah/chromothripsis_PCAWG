@@ -68,3 +68,11 @@ d[,i] = round(d[,i],digits=3)
 
 }
 
+d$histo = as.vector(d$histo)
+
+d$chromo_binary="No"
+d$chromo_binary[which(d$chromo==1)] = "Yes"
+
+d$type_chromo = as.vector(d$type_chromo)
+d$type_chromo[which(d$type_chromo == "NA")] = "No chromothripsis"
+

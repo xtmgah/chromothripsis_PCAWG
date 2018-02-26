@@ -1,292 +1,448 @@
 library(grid)
 library(gridExtra)
 library(plyr)
+library(reshape)
 library(DT)
+
+library(BioCircos)
 source("load_data.R")
 d$Chr = d$chrom
+library(shinythemes)
+library(googleCharts)
+library(shinyjs)
+library(shinyWidgets)
+library(shinycssloaders)
+
+appCSS <- "
+#loading-content {
+position: absolute;
+background: #000000;
+opacity: 0.9;
+z-index: 100;
+left: 0;
+right: 0;
+height: 100%;
+text-align: center;
+color: #FFFFFF;
+}
+"
+
+choices_cancer = sort(unique(d$histo)) 
+#----------------------------------------------------------------------------------
+shinyUI(
+    fluidPage(theme = shinytheme("sandstone"), 
+          tags$link(
+              rel = "stylesheet", 
+              href="http://fonts.googleapis.com/css?family=Open+Sans"
+              ),        
+
+          tags$body(style="font-family: 'Open Sans';"),
+          #useShinyjs(),
+          #inlineCSS(appCSS),
+          
+          ## Loading message
+          #div(
+          #    id = "loading-content",
+          #    h1("Chromothripsis explorer is loading.. Please wait for a few seconds..",style=("font-family: 'Open Sans';"))
+          #    ),
+
+          #hidden(div(id="app-content",
+               navbarPage(title="Chromothipsis in human cancers",
+                    tabPanel(title=div(style="font-size: 30px;",icon("home")),
+                             
+                             ## embargo information
+                             div(style=" right: 300px;",#position: absolute;
+                                 dropdownButton( tags$h3("Embargo policy",style="color: red;"),
+                                            tags$h4("Please note that the data reported in this site are under embargo. 
+                                                     Please contact Jennifer Jennings (jennifer.jennings [at] oicr.on.ca) and visit https://dcc.icgc.org/pcawg for further 
+                                                     information."), 
+                                             circle = TRUE, status = "danger", icon = icon("warning"), width = "600px", 
+                                             tooltip = tooltipOptions(title = "Embargo policy alert !") 
+                                             )
+                                 ),
+
+                         div(includeCSS("expanding-card-grid-with-flexbox/css/style2.css"),
+                           includeCSS("expanding-card-grid-with-flexbox/scss/style.scss"),
+                           includeScript("expanding-card-grid-with-flexbox/js/index.js"),
+                           includeHTML("expanding-card-grid-with-flexbox/lo.html")),
+                         googleChartsInit(),
+                         fluidRow(
+                              #### input to control barplot
+                              shiny::column(width=3,
+                                    h5("The barplot on the right depicts the chromothripsis rates in the cancer types selected
+                                       that satisfy the minimum values indicated below.",style="font-style:'Open Sans';text-align: justify; text-justify: inter-word;"),
+
+                                       sliderInput("min_nb_oscil", "Mininum number of CN oscillations",
+                                             min = 3, max = 600,
+                                             value = 4, animate = TRUE),
 
 
-shinyUI(fluidPage(
-  navbarPage("Chromothipsis analysis across 2,658 whole genomes",
-             
-             
-             
-             tabPanel("Home",
-footer=HTML('<hr><div style="margin-top: 20px; margin-bottom:20px;"><h4 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  text-align: center">Footer</h4></div>'),
-                
-HTML('<br><div style="margin-top: 20px; margin-bottom:20px;"><h2 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  text-align: center">
-     <hr>Companion site for:<br><br>Comprehensive analysis of chromothripsis in 2,658 human cancers using whole-genome sequencing<hr></div>'),
-  
-  HTML('<hr><div style= "text-align: center;margin-left: 10%;margin-right: 10%;">
-<h3  style="text-align: center;  line-height: 30px; font-family: Vollkorn;"> <br></br>
-Isidro Cortés-Ciriano<sup>1,2,3</sup>, June-Koo Lee<sup>1,2</sup>, Ruibin Xi<sup>4</sup>, Dhawal Jain<sup>1</sup>, Youngsook L. Jung<sup>1</sup>, 
-Dmitry Gordenin<sup>5</sup>, Leszek. J. Klimczak<sup>6</sup>, Cheng-Zhong Zhang<sup>1,7</sup>, David S. Pellman<sup>7,8</sup>, Peter J. Park<sup>1,2,*</sup> 
-on behalf of the PCAWG Structural Variation Working Group and the ICGC/TCGA Pan-Cancer Analysis of Whole Genomes Network</h3></div><hr>'),
-  
-  HTML('<div><h4 style="text-align: center; font-family: Vollkorn;"> 
-<p>1 Department of Biomedical Informatics, Harvard Medical School, Boston, Massachusetts, USA</p>
-<p>2 Ludwig Center at Harvard, Boston, MA 02115, USA</p>
-<p>3 Centre for Molecular Science Informatics, Department of Chemistry, University of Cambridge, Lensfield Road, Cambridge CB2 1EW, United Kingdom</p>
-<p>4 School of Mathematical Sciences and Center for Statistical Science, Peking University, Beijing 100871, China</p>
-<p>5 Genome Integrity and Structural Biology Laboratory</p>
-<p>6 Integrative Bioinformatics Group, National Institute of Environmental Health Sciences, US National Institutes of Health, Research Triangle Park, North Carolina, USA</p>
-<p>7 Department of Pediatric Oncology, Dana-Farber Cancer Institute, Boston, Massachusetts 02215, USA</p>
-<p>8 Howard Hughes Medical Institute and Department of Cell Biology, Harvard Medical School, Boston, Massachusetts 02115, USA</p>
-<p>* Correspondence should be addressed to P.J.P. (peter_park@hms.harvard.edu)</p>
-</h4><br></br></div>'),
+                                       sliderInput("breakpoints_cluster", "Brekpoints in cluster (including interchr SVs)",
+                                             min = 6, max = 1824,
+                                             value = 0, animate = TRUE),
+                                       sliderInput("nb_chrs_affected", "Number of chromosomes affected per tumor",
+                                             min = 1, max = 23,
+                                             value = 1, animate = TRUE)
+                                       ),
+                                    shiny::column(width = 9,
+                                            withSpinner(plotOutput("plot_rates"))
+                                            )
+                                    ),
 
-#### Abstract
-HTML('<br><div><h3 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;
-padding-top: 50px;
-    padding-right: 80px;
-    padding-bottom: 50px;
-    padding-left: 80px;">
-Chromothripsis is a newly discovered mutational process involving massive, clustered genomic rearrangements that occurs
-in cancer, human congenital diseases, and other contexts. Recent studies in cancer suggest that chromothripsis may be 
-far more common than initially inferred from low resolution DNA copy number data. Here, we analyze the patterns of 
-chromothripsis across of 2,658 tumors spanning 39 cancer types using whole-genome sequencing data. 
-We find that chromothripsis events are pervasive across human cancers, with >50% frequency in several cancer types.
-Instead of simple oscillations between two copy number states, a large fraction of the events involve multiple chromosomes as
-well as additional structural alterations that give rise to complex copy number profiles. We frequently detect signatures of 
-replicative processes and templated insertions in chromothripsis events displaying oscillations across two or more copy number states. 
-In addition, chromothripsis contributes to oncogene amplification as well as to inactivation of genes such as mismatch-repair related genes 
-whose loss promotes tumor development. 
-Thus, chromothripsis is a major process driving genome evolution in human cancer.</h3><hr></div>')
+                              fluidRow( 
+                                   sidebarPanel(
 
-  
-             ),
+                                        h5("Please select the set of cancer types you want to explore.
+                                           The cancer type selection affects the barplot showing the chromothripsis rates,
+                                           as well as the two bubble plots on the right side.",style="text-align: justify; text-justify: inter-word;"),
 
-##-------------
-tabPanel("Workflow",
-  
-  HTML('<br><div style="margin-top: 20px; margin-bottom:20px;"><h2 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  text-align: center">
-     <hr>Data and workflow followed for the detection of chromothripsis<hr></div>'),
-#### Abstract
-HTML('<center><img src="fig1.png" width="90%",height="90%"></center>'),
+                                           ## Select cancer type
+                                           checkboxGroupInput(inline = F,'cancer_type', 'Cancer type',
+                                                    choiceNames = c(choices_cancer,"Select all", "Clear selection"),  
+                                                    c(choices_cancer,"Select all","Clear selection"), selected="Biliary-AdenoCA")
+                                           ),
 
-HTML('<br><div #style="margin-top: 20px; margin-bottom:20px;"
-><h3 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom: 20px;  line-height: 30px;text-align: justify;margin-left: 10%; margin-right: 10%;
-padding-top: 50px;
-    padding-right: 80px;
-    padding-bottom: 50px;
-    padding-left: 80px; ">
-After removing low-quality samples using stringent quality control criteria,
-we applied our chromothripsis detection method to 2,543 tumor-normal pairs spanning 37
-cancer types.
-Of these, 2,428 cases harbored SVs and were considered for further analysis. 
-The SVs were identified by the ICGC SV subgroup, which applied four algorithms 
-and selected those SVs found by at least two algorithms. 
-<br><br>
-To identify chromothripsis-like patterns in the cancer genomes, 
-we extended the set of statistical criteria proposed by Campbell and Korbel (Cell, 2013).
-Given that chromothripsis events generate clusters 
-of interleaved rearrangements (i.e., the genomic regions bridged by their breakpoints overlap but are not nested), 
-we firstly scanned the each chromosome in each cancer genome for the presence of clusters of interwoven SVs.
-To find clusters, we constructed an undirected graph whose nodes correspond to SVs and whose 
-edges connect interleaved SVs. Thus, clusters of SVs can be detected by finding the connected components in the graph. 
-The connected component in each chromosome with the highest number of SVs was considered for further analysis. 
-We confined our analyses to the entire mappable genome with the exception of chromosome Y.
-<br><br>
-Once the SV clusters were detected, we tested whether the distribution of DNA fragment joints (i.e., duplication-like, deletion-like, 
-head-to-head and tail-to-tail inversions) diverged from a multinomial distribution with equal probabilities for each category 
-using the goodness-of-fit test for the multinomial distribution (chiq.test function from the R package stats), as described by 
-Korbel and Campbell (fragment joints test). In addition, we used the binomial test corrected for 
-mappability to evaluate the enrichment of SVs in each chromosome (chromosomal enrichment test). We also evaluated whether the 
-distribution of breakpoints differed from an exponential distribution as described by Korbel and Campbell 
-(exponential distribution of breakpoints test). 
-<br><br>
-The genomic regions delimited by the distal breakpoints composing 
-the clusters of interleaved SVs were further examined for the presence of contiguous genomic segments oscillating between two CN states. 
-To tune the parameters in our method, we used statistical thresholds and visual inspection. 
-For the minimum number of oscillating CN segments, we used two thresholds:
-<br><br>
-- high-confidence calls display uninterrupted oscillations between two states in at least 7 adjacent segments
-<br>
-- low-confidence calls involved between 4 and 6 uninterrupted CN oscillations 
-<br><br>
-Our chromothripsis calls were further classified into "canonical" if at least 60% of the CN segments in the complex rearrangement oscillate between 
-2 states, and "with other complex events" in cases where chromothripsis co-localizes with other genomic alterations.
-Finally, we visually inspected all candidate chromothripsis events that satisfied the statistical criteria described above.
+                                        mainPanel( 
+                                              h5("Explore the purity and ploidy of the tumors. Each bubble corresponds to a tumor, being its size proportional
+                                               to the total number of somatic SVs detected in it.",style="font-style:'Open Sans';"),
+                                               withSpinner( googleBubbleChart("chart", 
+                                                         width="100%", height = "475px",
+                                                         options = list(
+                                                                fontSize = 13,
+                                                                # Set axis labels and ranges
+                                                                hAxis = list(
+                                                                       title = "Purity",
+                                                                       viewWindow = list(-.5,1.5)
+                                                                       ),
+                                                                vAxis = list(
+                                                                       title = "Ploidy",
+                                                                       viewWindow = list(-.5,7)
+                                                                       ),
+                                                                # The default padding is a little too spaced out
+                                                                chartArea = list(
+                                                                         top = 50, left = 75,
+                                                                         height = "75%", width = "75%"
+                                                                         ),
+                                                                # Allow pan/zoom
+                                                                explorer = list(),
+                                                                # Set bubble visual props
+                                                                bubble = list(
+                                                                      opacity = 0.4, stroke = 0.1,colour="black", #none
+                                                                      # Hide bubble label
+                                                                      textStyle = list(
+                                                                               color = "none"
+                                                                               )
+                                                                      ),
+                                                                # Set fonts
+                                                                titleTextStyle = list(
+                                                                          fontSize = 16
+                                                                          ),
+                                                                tooltip = list(
+                                                                       textStyle = list(
+                                                                                fontSize = 12
+                                                                                )
+                                                                       )
+                                                                )
+                                                         )), #closing first chart
 
-</h3><hr></div>')
-
-),
+                                               fluidRow(
+                                                    shiny::column(4, offset = 1,
+                                                          sliderInput("purity", "Purity",
+                                                                min = min(d$purity,na.rm=T), max = max(d$purity,na.rm=T),
+                                                                value = min(d$purity,na.rm=T), animate = TRUE)
+                                                          ),
+                                                    shiny::column(4, offset = 1,
+                                                          sliderInput("ploidy", "Ploidy",
+                                                                min = min(d$ploidy,na.rm=T), max = max(d$ploidy,na.rm=T),
+                                                                value = min(d$ploidy), animate = TRUE)
+                                                          )
+                                                    ),
 
 
-
-##### SI ------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------
-tabPanel("Supplementary Information",
-#
-  
-HTML('<div style="margin-top: 20px; margin-bottom:20px;"><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;"> 
-     The information for all tumors examined, as well as the values for the statistical 
-     criteria used are listed in <a href="Table_S1.txt" download>Supplementary Table 1</a></h3> </div><hr>'),
-
-HTML('<br><div #style="margin-top: 20px; margin-bottom:20px;"
-><h3 style="background-color: WhiteSmoke;font-family: Vollkorn; 
-margin-top: 20px; margin-bottom: 20px;  line-height: 30px;text-align: justify;margin-left: 10%; margin-right: 10%;
-padding-top: 50px;
-    padding-right: 80px;
-    padding-bottom: 50px;
-    padding-left: 80px; ">
-The following files contain a visual depiction of the chromothripsis events detected, as referenced in our manuscript.
-<br></br>
-In all Supplementary Data Files intrachromosomal SVs are depicted as arcs with the breakpoints represented by black points, 
-whereas the breakpoints corresponding to interchromosomal SVs are depicted as colored points. Duplication-like SVs, deletion-like SVs, 
-head-to-head and tail-to-tail inversions are depicted in blue, orange, black, and green, respectively. The value for the statistical 
-criteria described above for each event is provided below its representation.
-</h3></div>'),
-
-  HTML('<a href="Data_Files/Data_File_1.pdf" download><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;">Supplementary Data File 1: High-confidence chromothripsis calls</h3></a>'),
-  HTML('<a href="Data_Files/Data_File_2.pdf" download><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;">Supplementary Data File 2: Low-confidence chromothripsis calls</h3></a>'),
-  HTML('<a href="Data_Files/Data_File_3.pdf" download><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;" >
-Supplementary Data File 3: Regions displaying CN oscillations not classified as chromothripsis. These include: (i) CN oscillating profiles characterized by clusters of tandem duplications or deletions, (ii) candidate chromothripsis cases satisfying the statistical criteria but considered false positives by visual inspection, 
-       and (iii) chromosomes displaying at least 7 CN oscillations with few or no SVs mapped.</h3></a>'),
-  HTML('<a href="Data_Files/Data_File_4.pdf" download><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;" >
-       Supplementary Data File 4: Large clusters of interleaved SVs (at least 20) not identified as chromothripsis by our method</h3></a>')
-  #HTML('<a href="Data_Files/Data_File_5.pdf" download><h3 style=" font-family: Vollkorn; 
-#margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 10%;margin-right: 10%;" >Supplementary Data File 5: Regions displaying at least 7 CN oscillations and without clusters of SVs mapped therein</h3></a><hr>')
-
-),
+                                               h5("Explore the chromothripsis events detected in the tumors of the types selected on the left-hand menu.
+                                                Note that chromosomes without chromothripsis events are not shown.
+                                                Each bubble corresponds to a chromosome (you can select a specific set of chromosomes below),
+                                                and their size is proportional to the number of somatic SVs detected in the tumor (all chromosomes considered)",
+                                                tyle="font-style:'Open Sans';"),
 
 
-# ------------------------------------------------------------------------------------------------
-##### Chromothripsis explorer ------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------
-tabPanel("Chromothripsis explorer",
+                                               h5("The y axis represents the number of uninterrupted CN oscillations in the chromothripsis region. 
+                                                The x axis shows corresponds to fraction of SVs involved in chromothripsis in a given chromosome with respect
+                                                to the total number of SVs detected in the tumor.",
+                                                style="font-style:'Open Sans';"),
 
-fluidRow( 
-  column(4,
-         wellPanel(
-           
-#            selectInput('cancer_type', 'Cancer type', sort(unique(d$histo))) ,
-#            selectInput('donor', 'Donor ID', unique(d$donor_unique_id[which(d$histo == input$cancer_type)])),
-#            uiOutput("donor_choice"),
-#            selectInput('chromosome', 'Chromosome', as.character(c(1:22,"X")))
-#            
-           
-           selectInput('cancer_type', 'Cancer type', sort(as.vector(unique(d$histo)))),
-           #selectInput('donor', 'Donor ID', unique(d$donor_unique_id[which(d$histo == input$cancer_type)]))
-           uiOutput("donor_choice")  #,
-           #selectizeInput('donor2', 'Donor ID', unique(d$donor_unique_id), selected = NULL, multiple = FALSE,options = NULL),
-           #selectInput('chromosome', 'Chromosome', as.character(c(1:22,"X"))  ##,
-          #selectInput('type_chromo', 'Chromothripsis category', c("All",unique(d$histo)))
-           #) 
-           )       
-),
+                                               withSpinner(googleBubbleChart("chart2",width="100%", height = "475px",
+                                                         options = list(
+                                                                fontSize = 13,
+                                                                # Set axis labels and ranges
+                                                                hAxis = list(
+                                                                       title = "Fraction SVs in tumor mapped to chromothripsis regions",
+                                                                       viewWindow = list(-.3,1)
+                                                                       ),
+                                                                vAxis = list(
+                                                                       title = "# of uninterrupted oscillations between 2 CN states",
+                                                                       viewWindow = list(-4,1000)
+                                                                       ),
+                                                                # The default padding is a little too spaced out
+                                                                chartArea = list(
+                                                                         top = 50, left = 75,
+                                                                         height = "75%", width = "75%"
+                                                                         ),
+                                                                # Allow pan/zoom
+                                                                explorer = list(),
+                                                                # Set bubble visual props
+                                                                bubble = list(
+                                                                      opacity = 0.4, stroke = "none",
+                                                                      # Hide bubble label
+                                                                      textStyle = list(
+                                                                               color = "none"
+                                                                               )
+                                                                      ),
+                                                                # Set fonts
+                                                                titleTextStyle = list(
+                                                                          fontSize = 16
+                                                                          ),
+                                                                tooltip = list(
+                                                                       textStyle = list(
+                                                                                fontSize = 12
+                                                                                )
+                                                                       )
+                                                                )
+                                                         ) #closes bubblechart 2
 
-column(8, HTML('<div style="margin-top: 20px; margin-bottom:20px;"><h3 style="font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: justify;margin-left: 10%;margin-right: 10%;"> 
-Select a cancer type and tumor of interest on the left-hand side menu.
-<br>
-<br>
-The first table below displays information about the patient,
-whereas the second table provides
-the values for the statistical criteria used to detect chromothripsis, as well as additional
-information associated to the chromothripsis regions and clusters of SVs identified (e.g., confidence and type
-of chromothripsis event). Each column corresponds to one chromosome.
-<br>
-<br>
-Finally, a circos plot of the entire genome is provided, 
-as well as a depiction of the 
-chromosome selected in the left-hand menu. Depending on the number of SVs detected in the selected tumor the plots might take a few seconds to load; please be patient.
-    </h3></div>'))
-  ),
+                                               ))
+                                              ), 
 
-HTML('<hr>'),
+                                        # chromosome choices
+                                        fluidRow(
+                                             shiny::column(3, offset = 1,
+                                                     selectizeInput( 'chrom', 'Chromosome', 
+                                                            choices = as.character(c(1:22,"X")), multiple = TRUE, 
+                                                            selected=as.character(c(1:22,"X") ))
+                                                     ),
 
-HTML('<div><h2>Patient information</h2></div>'),
-fluidRow( 
-  column(width=12,
-         DT::dataTableOutput("table_donor_info")) 
-),
+                                             shiny::column(3, offset = 1,
+                                                     sliderInput("oscil2", "# CN oscillations between 2 states",
+                                                           min = min(d[,"Nb. oscillating CN"],na.rm=T), 
+                                                           max = max(d[,"Nb. oscillating CN"],na.rm=T),
+                                                           value = 3, animate = TRUE)
+                                                     ),
+                                             shiny::column(3, offset = 0,
+                                                     sliderInput("fraction_SVs_chromo", "Fraction of SVs in chromothripsis region",
+                                                           min = min(d[,"ratio"],na.rm=T), 
+                                                           max = max(d[,"ratio"],na.rm=T),
+                                                           value = 0, animate = TRUE)
+                                                     )
 
-HTML('<hr>'),
-HTML('<br><div><h2>Values for the statistical metrics across chromosomes 1-22 and X</h2></div>'),
+                                             ),
+                                        fluidRow(
+                                             shiny::column(4,
+                                                     wellPanel(
+                                                         h5("The selection boxes below only affect the plots below them (not the bubble plots above)",
+                                                          style="font-style:'Open Sans';"),
+                                                         # type chromo
+                                                         selectizeInput( 'chromo_type', 'Chromothripsis categories?', 
+                                                                choices = c("After polyploidization","Before polyploidization","Canonical without polyploidization","No chromothripsis","With other complex events"), multiple = TRUE, 
+                                                                selected=c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events") ),
 
-fluidRow( 
-    column(width=12, 
-           DT::dataTableOutput("mytable2")) 
-  ),
+                                                         uiOutput('cancer_type2'),
+                                                         uiOutput("donor_choice")
+                                                         )
+                                                     ),
 
+                                             shiny::column(7, 
+                                                     wellPanel( 
+                                                         h4("Select the type of chromothripsis events and cancer types youw ant to explore on the left-hand side menu.",style="text-align: justify; text-justify: inter-word;"),
+                                                         tags$br(),
 
-HTML('<hr>'),
-HTML('<br><div><h2>Circos plot and chromosome-level view of CNV and SVs</h2></div>'),
+                                                         h4("An interactive and highy customizable circos plot permits the exploration of SNV, indels, CN and SV profiles. Please click on the information button for further details about the tracks. Depending on the number of SNVs, indels or SVs detected in the selected tumor the tracks might take a few seconds to load; please be patient.",
+                                                          style="text-align: justify; text-justify: inter-word;"),
 
+                                                         tags$br(),
+                                                         h4("Finally, two tables show information about the selected patient, comprehensive information about values for the statistical criteria used to detect chromothripsis for all chromosomes in the selected tumor, as well as additional information. Each column corresponds to one chromosome.",style="text-align: justify; text-justify: inter-word;")
 
-fluidRow( 
-  column(4,
-         wellPanel(
-           selectInput('chromosome', 'Chromosome', as.character(c(1:22,"X"))
-         ) 
-  )
-  )
-),
+                                                         )
+
+                                                     )
+                                             ),
 
 
 
-fluidRow(
-    column(width = 12, class = "well",
-           #h4("The left plot represents the entire chromosome, whereas the left plot depicts the region affected by chromothripsis (if any)"),
-           
-           fluidRow(
-             column(width = 6,
-                    #plotOutput("test", height = 800)
-                    imageOutput("myImage")
-             ),
-             column(width = 6,
-                    plotOutput("plot_chromo", height = 800)
-             )
-           )
-    )
-)
-  
-),
+                                        tags$br(),
+
+                                        h3('Interactive circos plots reporting SNVs, indels, total CNV, minor CN (LOH), and SV calls')
+                                        ,
+                                        fluidRow(
+
+                                             sidebarPanel(width=3,h5("Circos plot options",style="font-weight: bold;"),
+                                                    checkboxInput( inputId='show_patho_indels', label='Show pathogenic indels',value = FALSE),
+                                                    checkboxInput( inputId='show_nopatho_indels', label='Show non-pathogenic indels',value = FALSE),
+                                                    checkboxInput( inputId='show_patho', label='Show pathogenic SNVs',value = FALSE),
+                                                    # "nonsynonymous SNV","stopgain","stoploss","frameshift deletion","frameshift insertion"
+                                                    checkboxInput( inputId='show_nopatho', label='Show non-pathogenic SNVs',value = FALSE),
+                                                    # range for distanc
+                                                    sliderInput(step = 500000,"range_dist", "Range intermutation distance:", 
+                                                          min = 0, max = 6000000, value = c(0,1000000)),
+
+                                                    # show genes?
+                                                    checkboxInput( inputId='show_genes', label='Show gene track',value = TRUE),
+
+                                                    # show chromothripsis track?
+                                                    checkboxInput( inputId='show_chromo_track', label='Highlight chromothripsis regions',value = TRUE),
+
+                                                    #checkboxGroupInput
+                                                    selectizeInput( 'chr_selection_circos', 'Chromosome selection for circos plot', 
+                                                           choices = as.character(c(1:22,"X")), 
+                                                           multiple = TRUE, selected=as.character(c(1,22,"X")) )
+
+                                                    #pickerInput(inline = F,multiple=T,'chr_selection_circos', options = list(`actions-box` = TRUE),
+                                                    #            'Chromosome selection for circos plot', as.character(c(1:22,"X")),selected=as.character(c(22,"X")) )
 
 
-# ------------------------------------------------------------------------------------------------
-# Acknowledgments
-# ------------------------------------------------------------------------------------------------
-tabPanel("Acknowledgements and funding",
-  
-  HTML('<hr><div><h3 style=" font-family: Vollkorn; 
-margin-top: 20px; margin-bottom:20px;  line-height: 30px;text-align: center;margin-left: 15%;margin-right: 15%;">The results published here are partly based upon data generated by The 
-Cancer Genome Atlas and obtained from the Database of Genotypes and Phenotypes (dbGaP) with accession number phs000178.v8.p7.
-<br><br>
-Information about TCGA can be found at http://cancergenome.nih.gov. We thank the Research Information Technology Group at 
-Harvard Medical School for providing computational resources. This work was supported by grants from the Ludwig Center at Harvard (I.C.C., J.K.L., and P.J.P.). 
-<br><br>
-This project has received funding from the European Union’s Framework Programme For Research and Innovation Horizon 2020 (2014-2020) under 
-the Marie Curie Sklodowska-Curie Grant Agreement No. 703543 (I.C.C.).
-</h3>
- </div>
-     <hr><p style="text-align: center;font-family: Vollkorn;"> This site was designed by Isidro Cortes-Ciriano (isidrolauscher@gmail.com)</p>
-     <p style="text-align: center;font-family: Vollkorn;"> Shiny App deployment by <a href="https://github.com/scottx611x">Scott Ouellette</a></p><br></br><br></br>')
-  
+                                                    ),
+                                             mainPanel(width=9,
+                                                   dropdownButton(
+                                                          div(
+                                                            tags$h3("Track information (from outside to inside)",style = "display: inline-block;")),
 
-)
+                                                          # cytobands
+                                                          div( tags$h4(tags$b("Track 1. hg19 cytobands"))),
 
-), tags$style(type = 'text/css', '.navbar { background-color: "black";
-                                               
-                                               font-size: 30px;
-              color: "black"; }',
-              
-              '.navbar-dropdown { background-color: #262626;
-              font-family: Arial;
-              font-size: 13px;
-              color: #FF0000; }')
-)
-)
+                                                          # intermutation distance
+                                                          div(tags$h4(tags$b("Track 2. Intermutation distance"),style = "display: inline-block;"),
+                                                            tags$br(),                                         
+                                                            tags$h4("This track displays the intermutation distance for:
+                                                                (i) pathogenic indels (large green dots),
+                                                                (ii) nonpathogenic indels (small black dots), (iii) pathogenic SNVs (large blue dots), 
+                                                                and (iv) nonpathogenic SNVs (small dots coloured according to the type of substitution)
+                                                                and SNVs. 
+                                                                Pathogenic mutations are defined as 
+                                                                nonsynonymous, stopgain, stoploss, frameshift deletion,frameshift insertion. 
+                                                                The y-axis, which can be modified using the slider on the left-hand side, represents the distance to the next mutation in the genome.")),
 
-#font-family: Arial;
+                                                                # chromothripsis region
+                                                                tags$br(),  
+                                                                div(tags$h4(tags$b("Track 2. Chromothripsis regions"),style = "display: inline-block;"),
+                                                                  tags$h4("Chromothripsis regions are indicated by a yellow bar on the same track as the SNVs and indels.")),
+
+                                                                # CN
+                                                                tags$br(),  
+                                                                div(tags$h4(tags$b("Track 3. Total copy number (CN)"),style = "display: inline-block;"),
+                                                                  tags$h4("The total CN values are displayed in black. This track has a light blue background.")),
+
+                                                                # minor CN
+                                                                tags$br(),  
+                                                                div(tags$h4(tags$b("Track 4. Minor copy number"),style = "display: inline-block;"),
+                                                                  tags$h4("Loss-of-heterozygosity (LOH) regions                                                                       are shown in red. This track has a grey background.")),
+
+                                                                      # genes 
+                                                                      tags$br(),  
+                                                                      div(tags$h4(tags$b("Track 5. Gene annotations"),style = "display: inline-block;"),
+                                                                        tags$h4("Tumor suppressors and oncogenes are displayed in blue and red respectively.")),
+
+                                                                      # SVs 
+                                                                      tags$br(),  
+                                                                      div(tags$h4(tags$b("Track 6. Structural variations. "),style = "display: inline-block;"),
+                                                                        tags$h4("Duplication-like SVs, deletion-like SVs, head-to-head and tail-to-tail inversions 
+                                                                            are depicted in blue, orange, black, and green, respectively.")),
+
+                                                                            # NOTE
+                                                                            tags$br(),  
+                                                                            div(tags$h4(tags$b("NOTE"),style = "display: inline-block;"),
+                                                                              tags$h4("Please note that if you display the SNVs/indels for multiple chromosomes at the same time the plot
+                                                                                  might take a few seconds to load. Please be patient.. Only chromosomes 1, 22 and X are selected
+                                                                                  when launching the site to reduce loading times (please adjust your selection using the menu on the
+                                                                                                           left-hand side).")),
+
+
+
+                                                                                  circle = TRUE, status = "danger", icon = icon("info-circle"), width = "1100px",
+                                                                                  tooltip = tooltipOptions(title = "Click here for details about the tracks !")),
+
+
+                                                   withSpinner(BioCircosOutput("biocirc", height='900px',width="1000px")
+                                                                              #plotOutput("plot_chromo_gg",height='600px')
+                                                                              #)
+                                                                              ))
+                                                                            ),
+
+
+                                                                        #----------------------------------
+                                                                        div(HTML('<h2>Patient information</h2>')),
+                                                                        fluidRow(#offset=1,width=11,
+                                                                             shiny::column(width=12,
+                                                                                   div(DT::dataTableOutput("table_donor_info"), 
+                                                                                     style = "overflow-x: scroll"))
+                                                                             ),
+
+                                                                        tags$br(),
+                                                                        h2('Values for the statistical metrics and additional information for chromosomes 1-22 and X'),
+                                                                        # 
+                                                                        tags$br(),
+                                                                        fluidRow(#offset=1,width=11,
+                                                                             shiny::column(width=12,
+                                                                                   class="table-hover",
+                                                                                   div(DT::dataTableOutput("mytable2"), style = 'overflow-x: scroll'))##style = "font-size:80%;"))
+                                                                             )
+                                                                        #----------------------------------
+
+
+                                                                        ),
+
+
+                                                                      # # ------------------------------------------------------------------------------------------------
+                                                                      # # Acknowledgments
+                                                                      # # ------------------------------------------------------------------------------------------------
+                                                                      tabPanel(title=div(style="font-size: 30px;",icon("envelope"),id="acknow"),
+                                                                           h3("Acknowledgements"),
+                                                                           tags$br(),
+                                                                           h4("The results published here are partly based upon data generated by The Cancer 
+                                                                            Genome Atlas and obtained from the Database of Genotypes and Phenotypes (dbGaP) with accession number phs000178.v8.p7.",
+                                                                            style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
+                                                                           tags$br(),
+                                                                           h4("Information about TCGA can be found at http://cancergenome.nih.gov. We thank the Research
+                                                                            Information Technology Group at Harvard Medical School for providing computational resources.
+                                                                            This work was supported by grants from the Ludwig Center at Harvard (I.C.C., J.K.L., and P.J.P.).",
+                                                                            style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
+                                                                           tags$br(),
+                                                                           h4("This project has received funding from the European Union’s Framework Programme 
+                                                                            For Research and Innovation Horizon 2020 (2014-2020) under the Marie Curie Sklodowska-Curie 
+                                                                            Grant Agreement No. 703543 (I.C.C.).",
+                                                                            style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
+                                                                           tags$br(),
+
+                                                                           h4("This work was performed as part of the PCAWG Structural Variation Working Group.",
+                                                                            style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
+                                                                           tags$br(),
+                                                                           h4("This site was designed by Isidro Cortes-Ciriano (isidrolauscher at gmail.com).",
+                                                                            style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
+                                                                           tags$a(href="https://github.com/scottx611x", "Shiny App deployment by Scott Oullette",
+                                                                              style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 9em;")
+
+
+                                                                           ),
+
+
+                                                                      ##### SI ------------------------------------------------------------------------------------------------
+                                                                      # ------------------------------------------------------------------------------------------------
+                                                                      tabPanel(div("Supplementary Information",
+                                                                             class="nav navbar-nav navbar-right",
+                                                                             style="height: 30px; line-height: 30px; text-align: center; font-style: 'Open Sans"),
+
+
+                                                                           div(includeHTML("expanding-card-grid-with-flexbox/SI.html"),
+                                                                             includeCSS("expanding-card-grid-with-flexbox/css/style2.css"),
+                                                                             includeCSS("expanding-card-grid-with-flexbox/scss/style.scss"),
+                                                                             includeScript("expanding-card-grid-with-flexbox/js/index.js")),
+
+                                                                           h4("In all Supplementary Data Files intrachromosomal SVs are depicted as arcs with the breakpoints represented by black points,
+                                                                            whereas the breakpoints corresponding to interchromosomal SVs are depicted as colored points. Duplication-like SVs, deletion-like SVs,
+                                                                            head-to-head and tail-to-tail inversions are depicted in blue, orange, black, and green, respectively. The value for the statistical
+                                                                            criteria described above for each event is provided below its representation.",style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 8em;")
+
+                                                                            )
+                                                                           ), div(class="footer",includeHTML("freebie-footer-templates/footer-distributed-with-address-and-phones.html"),
+                                                                           includeCSS("freebie-footer-templates/css/footer-distributed-with-address-and-phones.css")) 
+                                                                      )
+                                                                  #))
+                                                            )
