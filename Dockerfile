@@ -10,6 +10,8 @@ RUN  echo 'install.packages(c("gridExtra", "DT", "ggplot2", "grid", "gridExtra",
 
 RUN R -e "install.packages(c('devtools'), dependencies=TRUE)"
 RUN R -e "devtools::install_github('jcheng5/googleCharts')"
+RUN R -e "devtools::install_github('andrewsali/shinycssloaders')"
+RUN R -e "devtools::install_github('dreamRs/shinyWidgets')"
 
 COPY app/ /srv/shinyapps/app
 
