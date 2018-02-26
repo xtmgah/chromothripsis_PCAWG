@@ -416,7 +416,7 @@ shinyUI(
                                                                            tags$br(),
                                                                            h4("This site was designed by Isidro Cortes-Ciriano (isidrolauscher at gmail.com).",
                                                                             style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 7em;"),
-                                                                           tags$a(href="https://github.com/scottx611x", "Shiny App deployment by Scott Oullette",
+                                                                           tags$a(href="https://github.com/scottx611x", "Shiny App deployment by Scott Ouellette",
                                                                               style="font-style:'Open Sans';  width: 80%; display: block; align: center; margin-left: 9em;")
 
 
