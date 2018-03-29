@@ -1,4 +1,3 @@
-
 library(BioCircos)
 nucle = c("A","C","G","T")
 nucle= expand.grid(nucle,nucle)
@@ -33,10 +32,15 @@ genome = list("1" = 249250621, #Hg19
 			  "22" = 51304566,
 			  "X" = 155270560)
 #----------------------------------------------------------
-plot_biocirc = function(donor,input){
-
+plot_biocirc = function(input2,input){
+	#Sys.sleep(2)
+	donor=input2$donor
+	#cat("__biocirc___");print(donor); cat("__biocirc___")
 	chrs_selection = input$chr_selection_circos
 	if (length(input$chr_selection_circos)==0){chrs_selection=c("22")}
+	#chrs_selection = chr_selection_circos
+	#if (length(chr_selection_circos)==0){chrs_selection=c("22")}
+
 	chr_info = readRDS("chr_info_processed.rds")
 	# chrs selection
 	myGenome = genome[which(names(genome) %in% chrs_selection)]
@@ -58,12 +62,12 @@ plot_biocirc = function(donor,input){
 	nopatho=NULL; patho=NULL
 
 	# get the rage for the interdistance mutations
-	if(input$show_patho_indels == TRUE | input$show_nopatho_indels == TRUE | input$show_patho == TRUE | input$show_nopatho == TRUE){
+	if(input2$show_patho_indels == TRUE | input2$show_nopatho_indels == TRUE | input2$show_patho == TRUE | input2$show_nopatho == TRUE){
 		# get the correct range
 		indel_file = paste0("./rds_processed_indels/",donor,"_nopatho.rds")
 		indels_nopatho = tryCatch( readRDS(indel_file) ,error=function(e) NULL)
 		if (!is.null(indels_nopatho)){
-			idxnow = which(indels_nopatho$Chr %in% chrs_selection &  indels_nopatho$dista <input$range_dist[2])
+			idxnow = which(indels_nopatho$Chr %in% chrs_selection &  indels_nopatho$dista <input2$range_dist[2] &  indels_nopatho$dista >input2$range_dist[1])
 			if(length(idxnow)>0){
 				indels_nopatho=indels_nopatho[idxnow,]
 				if (!is.null(indels_nopatho)){
@@ -78,7 +82,7 @@ plot_biocirc = function(donor,input){
 		indel_file = paste0("./rds_processed_indels/",donor,"_patho.rds")
 		indels_patho = tryCatch( readRDS(indel_file) ,error=function(e) NULL)
 		if (!is.null(indels_patho)){
-			idxnow=which(indels_patho$Chr %in% chrs_selection &  indels_patho$dista <input$range_dist[2])
+			idxnow=which(indels_patho$Chr %in% chrs_selection &  indels_patho$dista <input2$range_dist[2] & indels_patho$dista >input2$range_dist[1])
 			if(length(idxnow)>0){
 				indels_patho=indels_patho[idxnow,]
 				if (!is.null(indels_patho)){
@@ -99,7 +103,7 @@ plot_biocirc = function(donor,input){
 		nopatho_file = paste0("./rds_processed/",donor,"_nopatho.rds")
 		nopatho = tryCatch( readRDS(nopatho_file) ,error=function(e) NULL)
 		if (!is.null(nopatho)){
-			idxnow = which(nopatho$Chr %in% chrs_selection  & nopatho$dista <input$range_dist[2])
+			idxnow = which(nopatho$Chr %in% chrs_selection  & nopatho$dista <input2$range_dist[2] & nopatho$dista >input2$range_dist[1])
 			if (length(idxnow) > 0){
 				nopatho=nopatho[idxnow,]
 				if (!is.null(nopatho)){
@@ -114,7 +118,7 @@ plot_biocirc = function(donor,input){
 		patho_file = paste0("./rds_processed/",donor,"_patho.rds")
 		patho = tryCatch( readRDS(patho_file) ,error=function(e) NULL)
 		if (!is.null(patho)){
-			idxnow = which(patho$Chr %in% chrs_selection  & patho$dista <input$range_dist[2])
+			idxnow = which(patho$Chr %in% chrs_selection  & patho$dista <input2$range_dist[2] &patho$dista >input2$range_dist[1])
 			if (length(idxnow)>0){
 				patho=patho[idxnow,]
 				if (!is.null(patho)){
@@ -132,10 +136,10 @@ plot_biocirc = function(donor,input){
 		# -min(c(range_patho[1],range_snvs_no_patho[1]),na.rm=T)
 
 		#)
-		range_snvs = c(#-input$range_dist,
+		range_snvs = c(#-input2$range_dist,
 					   #-max(
 					   #-3000000,
-					   -1 * as.numeric(input$range_dist[2]),
+					   -1 * as.numeric(input2$range_dist[2]),
 					   # c(range_snvs[1],range_indels[1]),na.rm=T),
 					   0)
 		range_indels=range_snvs
@@ -144,9 +148,9 @@ plot_biocirc = function(donor,input){
 	# INDELS
 	#----------------------------------------------------------
 	## NONPATHOGENIC INDELS
-	if(input$show_nopatho_indels == TRUE){
+	if(input2$show_nopatho_indels == TRUE){
 		if (!is.null(indels_nopatho)){
-			idxnow=which(indels_nopatho$Chr %in% chrs_selection & indels_nopatho$dista <input$range_dist[2])
+			idxnow=which(indels_nopatho$Chr %in% chrs_selection & indels_nopatho$dista <input2$range_dist[2] & indels_nopatho$dista >input2$range_dist[1])
 
 			if(length(idxnow)>=1){
 				indels_nopatho = indels_nopatho[idxnow,]
@@ -166,7 +170,7 @@ plot_biocirc = function(donor,input){
 			indel_file = paste0("./rds_processed_indels/",donor,"_nopatho.rds")
 			indels_nopatho = tryCatch( readRDS(indel_file) ,error=function(e) NULL)
 			if (!is.null(indels_nopatho)){
-				idxnow = which(indels_nopatho$Chr %in% chrs_selection & indels_nopatho$dista <input$range_dist[2])
+				idxnow = which(indels_nopatho$Chr %in% chrs_selection & indels_nopatho$dista <input2$range_dist[2] & indels_nopatho$dista >input2$range_dist[1])
 				if(length(idxnow)>0){
 					indels_nopatho=indels_nopatho[idxnow,]
 					if (!is.null(indels_nopatho)){
@@ -189,9 +193,9 @@ plot_biocirc = function(donor,input){
 
 
 	##### PATHOGENIC
-	if(input$show_patho_indels == TRUE){
+	if(input2$show_patho_indels == TRUE){
 		if (!is.null(indels_patho)){
-			idxnow=which(indels_patho$Chr %in% chrs_selection  & indels_patho$dista <input$range_dist[2])
+			idxnow=which(indels_patho$Chr %in% chrs_selection  & indels_patho$dista <input2$range_dist[2]& indels_patho$dista >input2$range_dist[1])
 
 			if(length(idxnow)>=1){
 				indels_patho = indels_patho[idxnow,]
@@ -209,7 +213,7 @@ plot_biocirc = function(donor,input){
 			indel_file = paste0("./rds_processed_indels/",donor,"_patho.rds")
 			indels_patho = tryCatch( readRDS(indel_file) ,error=function(e) NULL)
 			if (!is.null(indels_patho)){
-				idxnow=which(indels_patho$Chr %in% chrs_selection & indels_patho$dista <input$range_dist[2])
+				idxnow=which(indels_patho$Chr %in% chrs_selection & indels_patho$dista <input2$range_dist[2]& indels_patho$dista >input2$range_dist[1])
 				if(length(idxnow)>0){
 					indels_patho=indels_patho[idxnow,]
 					if (!is.null(indels_patho)){
@@ -238,7 +242,7 @@ plot_biocirc = function(donor,input){
 	#----------------------------------------------------------
 	# load SNVs 
 	#----------------------------------------------------------
-	if(input$show_nopatho == TRUE){
+	if(input2$show_nopatho == TRUE){
 
 		if(!is.null(nopatho)){
 
@@ -246,7 +250,7 @@ plot_biocirc = function(donor,input){
 			nopatho = tryCatch( readRDS(snv_file_nopatho) ,error=function(e) NULL)
 
 			if (!is.null(nopatho)){
-				idxnow = which(nopatho$Chr %in% chrs_selection  & nopatho$dista <input$range_dist[2])
+				idxnow = which(nopatho$Chr %in% chrs_selection  & nopatho$dista <input2$range_dist[2]& nopatho$dista >input2$range_dist[1])
 				if (length(idxnow) > 0){
 					nopatho=nopatho[idxnow,]
 					if (!is.null(nopatho)){
@@ -265,7 +269,7 @@ plot_biocirc = function(donor,input){
 				}
 			}
 		} else{
-			idxnow=which(nopatho$Chr %in% chrs_selection   & nopatho$dista <input$range_dist[2])
+			idxnow=which(nopatho$Chr %in% chrs_selection   & nopatho$dista <input2$range_dist[2]& nopatho$dista >input2$range_dist[1])
 
 			if(length(idxnow)>=1){
 				nopatho = nopatho[idxnow,]
@@ -285,14 +289,14 @@ plot_biocirc = function(donor,input){
 
 
 	######  pathogenic SNVs    
-	if(input$show_patho == TRUE){
+	if(input2$show_patho == TRUE){
 
 		if (is.null(patho)){
 			snv_file_patho = paste0("./rds_processed/",donor,"_patho.rds")
 			patho = tryCatch( readRDS(snv_file_patho) ,error=function(e) NULL)
 
 			if (!is.null(patho)){
-				idxnow = which(patho$Chr %in% chrs_selection  & patho$dista <input$range_dist[2])
+				idxnow = which(patho$Chr %in% chrs_selection  & patho$dista <input2$range_dist[2]& patho$dista >input2$range_dist[1])
 				if (length(idxnow)>0){
 					patho=patho[idxnow,]
 					if (!is.null(patho)){
@@ -311,7 +315,7 @@ plot_biocirc = function(donor,input){
 				}
 			}
 		}else{
-			idxnow=which(patho$Chr %in% chrs_selection  & patho$dista <input$range_dist[2])
+			idxnow=which(patho$Chr %in% chrs_selection  & patho$dista <input2$range_dist[2]& patho$dista >input2$range_dist[1])
 
 			if(length(idxnow)>=1){
 				patho = patho[idxnow,]
@@ -347,8 +351,10 @@ plot_biocirc = function(donor,input){
 	tracks = tracks + BioCircosBackgroundTrack("testBGtrack1", minRadius = 0.85, maxRadius = 0.55,
 											   borderColors = "black", borderSize = .1)    
 	#### chromothripsis track below the CN track
-	if (input$show_chromo_track){
-		idxx = which(d_now$type_chromo != "No chromothripsis")
+	if (input2$show_chromo_track){
+		#idxx = which(d_now$type_chromo != "No chromothripsis")
+		#idxx = which(d_now$type_chromo == "High confidence")
+		idxx = grep("igh",as.vector(d_now$chromo_label))
 		if(length(idxx)>0){
 			pepe = d_now[idxx,]  
 
@@ -361,6 +367,22 @@ plot_biocirc = function(donor,input){
 												ends=c(pepe$End),
 												values = 1,
 												color = "#eded2a", ##abd9e9",
+												width=.4,range=c(.8,1.2))
+		}
+		#idxx = which(d_now$type_chromo == "Low confidence")
+		idxx = grep("ow",d_now$chromo_label)
+		if(length(idxx)>0){
+			pepe = d_now[idxx,]  
+
+			tracks = tracks + BioCircosArcTrack('chromo_track', maxRadius = .85,minRadius = 0.84,
+												# chromosomes = cnv_now$chromosome, starts = cnv_now$start, 
+												# ends=cnv_now$end, 
+												# values = cnv_now$total_cn, 
+												chromosomes = as.vector(pepe$Chr),
+												starts = c(pepe$Start),
+												ends=c(pepe$End),
+												values = 1,
+												color = "#a1d99b", #eded2a", ##abd9e9",
 												width=.4,range=c(.8,1.2))
 		}
 	}
@@ -385,7 +407,7 @@ plot_biocirc = function(donor,input){
 
 	tracks = tracks + BioCircosBackgroundTrack("testBGtrack2", minRadius = 0.45, maxRadius = 0.54,
 											   fillColors = "#ede8e8",borderColors =  "black", borderSize = 0.1) 
-	if(input$show_genes == TRUE){
+	if(input2$show_genes == TRUE){
 
 		genes = readRDS("genes_processed.rds")
 		genes = genes[which(genes$chr %in% chrs_selection),]
@@ -479,10 +501,9 @@ plot_biocirc = function(donor,input){
 											 displayLabel = F,
 											 maxRadius = 0.4)
 		caja=1}
-
 	BioCircos(genome=myGenome, tracks, yChr = F, chrPad = .03, displayGenomeBorder = T, 
 			  genomeTicksLen = 4, genomeTicksTextSize = 0, genomeTicksScale = 50000000,
 			  genomeLabelTextSize = 30, #genomeLabelDisplay  = T,
 			  genomeFillColor = rep("white",23),genomeBorderColor = "black",genomeBorderSize = 2)
-
+	
 }
