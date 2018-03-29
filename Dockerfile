@@ -17,5 +17,10 @@ COPY app/ /srv/shinyapps/app
 
 RUN R CMD INSTALL /srv/shinyapps/app/dist/BioCircos.tar.gz
 
+RUN  echo 'install.packages(c("shiny", "shinyWidgets", "shinydashboard"),\
+           repos="http://cran.us.r-project.org", \
+           dependencies=TRUE)' \
+           > /tmp/packages.R && Rscript /tmp/packages.R
+
 EXPOSE 3242
 CMD ["R", "-e", "shiny::runApp('/srv/shinyapps/app', 3242, host='0.0.0.0')"]
