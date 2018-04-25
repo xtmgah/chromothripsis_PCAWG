@@ -232,7 +232,7 @@ function(input, output, session) {
 	})
 
 	observeEvent(c(
-				   input$chr_selection_circos,input$range_dist,input$show_patho_indels, input$show_nopatho_indels,input$show_patho,input$show_nopatho,input$show_chromo_track,input$show_genes
+				   input$chr_selection_circos,input$range_dist,input$show_patho_indels, input$show_nopatho_indels,input$show_patho,input$show_nopatho,input$show_chromo_track,input$show_genes, input$donor
 				   ), { output$biocirc <- renderBioCircos({
 				   plot_biocirc(input2,input)#$chrs_selection_circos)
 				   })
