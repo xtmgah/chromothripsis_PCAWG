@@ -1,4 +1,4 @@
-# chromothripsis_PCAWG [![Build Status](https://travis-ci.com/parklab/chromothripsis_PCAWG.svg?token=EkzyvwdZ2jcY78ErmS88&branch=master)](https://travis-ci.com/parklab/chromothripsis_PCAWG)
+# chromothripsis_PCAWG [![Build Status](https://travis-ci.org/parklab/chromothripsis_PCAWG.svg?branch=master)](https://travis-ci.org/parklab/chromothripsis_PCAWG)
 
 [Maintainer Notes](https://github.com/parklab/chromothripsis_PCAWG/wiki/Dev-Notes)
 
