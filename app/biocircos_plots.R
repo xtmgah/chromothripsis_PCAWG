@@ -34,6 +34,7 @@ genome = list("1" = 249250621, #Hg19
 #----------------------------------------------------------
 plot_biocirc = function(input2,input){
 	#Sys.sleep(2)
+	#donor=input$donor
 	donor=input2$donor
 	#cat("__biocirc___");print(donor); cat("__biocirc___")
 	chrs_selection = input$chr_selection_circos

@@ -9,6 +9,18 @@ d$colour_ICGC = colours_ICGC$V2[match(d$histo,colours_ICGC$V1)]
 
 function(input, output, session) {
 	choices_cancer = sort(unique(d$histo)) 
+
+
+## search mutations
+  #output$searchString <- renderText({
+  #  values$searchString
+  #}) 
+
+
+	#output$txt2Test <- renderText({ input$txt2 })
+
+
+
 	observe({
 		output$cancer_type <- renderUI({
 			selectizeInput(multiple=T,'donor', 'Donor ID', choices_cancer)
@@ -22,6 +34,12 @@ function(input, output, session) {
 						lapply(defaultColors, function(color) { list(color=color) }),
 						names = colours_ICGC$V1
 						)
+
+	#series2 <- structure(
+#						 lapply(defaultColors, function(color) { list(color=color) }),
+#						 names = levels(unique(d$histo)) 
+#						 )
+
 	yearData <- reactive({
 		print(d$donor_age_at_diagnosis)
 		idx = which(d$purity >= input$purity & d$ploidy >= input$ploidy & d$histo %in% input$cancer_type & 
@@ -87,20 +105,40 @@ function(input, output, session) {
 	#	w_chromo = unique(now2$donor_unique_id[grep("High|Low",now2$chromo_label)])
 
 	# Combine the selected variables into a new data frame
-	selectedData <- reactive({
-		d[which(d$donor_unique_id == input$donor & d$Chr == input$chromosome),]
-	})
+selectedData <- reactive({
+    d[which(d$donor_unique_id == input$donor & d$Chr == input$chromosome),]
+})
 
 
-	selectedData_donor_info <- reactive({
-		out = unique(clinical[which(clinical$donor_unique_id == input$donor),])
-		out = t(unique(out))
-		colnames(out)="Value"
-		return(out)
-	})
+selectedData_donor_info <- reactive({
+    out = unique(clinical[which(clinical$donor_unique_id == input$donor),])
+    out = t(unique(out))
+    colnames(out)="Value"
+    return(out)
+})
 
-	selectedData_all_chrs <- reactive({
 
+##selectedData_donor_info <- reactive({
+##    out = unique(d[which(d$donor_unique_id == input$donor),])
+##    print(input$donor)
+##    col_names = c( "icgc_donor_id"      ,
+##                  "submitted_donor_id"       ,
+##                  "tcga_donor_uuid"       ,
+##                  "donor_sex"        ,
+##                  "donor_vital_status"     ,
+##                  "donor_age_at_diagnosis"   ,
+##                  "donor_survival_time"       ,
+##                  "donor_interval_of_last_followup",
+##                  "tumor_stage"
+##                  )
+##    out = out[,which(names(out) %in% col_names)]
+##    out = t(unique(out))
+##    print(out)
+##    colnames(out)="Value"
+##    return(out)
+##})
+selectedData_all_chrs <- reactive({
+		#d$zcomment = d$comment	
 		out = d[which(d$donor_unique_id == input$donor & d$Chr %in% input$cols_to_show),]
 
 		col_names=c(
@@ -134,7 +172,8 @@ function(input, output, session) {
 					"FDR exponential dist. cluster"  ,          
 					"FDR fragment joints intrachr. SVs"   ,                                                    
 					"TP53_mutations",                           
-					"MDM2_CN"                                                                
+					"MDM2_CN",
+					"comment"
 					)
 
 		# select table for only the chrs with chromothripsis
@@ -171,51 +210,113 @@ function(input, output, session) {
 		return(out)
 	})
 
+	#get_cases_with_chromo_type = function(d,input){
+	#	choices=sort(unique(d$histo[which(d$type_chromo %in% input$chromo_type)]))
+	#	if length(choices == 0){
+	#		out=choices} else{
+	#		out="Biliary-AdenoCA"
+	#	}
+	#	return(out)
+	#}
+
+
+
+	#get_width2 = function(d,input){
+	#	out=c(); out2=c()
+	#	typ =c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events")
+	#	if ( sum(input$chromo_type %in% typ)>0 ){
+	#		typ_now = typ[which(typ %in% input$chromo_type)]
+	#		sele=sort(unique(d$donor_unique_id[which(d$histo == input$cancer_type2 & d$type_chromo %in% typ_now)]))
+	#		sele = d[which(d$histo == input$cancer_type2 & d$type_chromo %in% typ_now),]
+	#		out = sort(unique(sele$donor_unique_id))
+	#sor#t(unique(d$donor_unique_id[which(d$histo == input$cancer_type2 & d$type_chromo %in% typ_now)]))
+	#		out2=sele$Chr[ which(sele$type_chromo %in% typ & sele$donor_unique_id == input$donor)]
+	#	}
+	#	if ("No chromothripsis" %in% input$chromo_type){
+	#		now = d[which(d$histo == input$cancer_type2),]
+	#		now_sum = ddply(now,.(donor_unique_id),summarise,tot=sum(type_chromo!="No chromothripsis"))
+	#		now_sum = unique(now_sum$donor_unique_id[now_sum$tot==0])
+	#		out =c(out, now_sum)
+	#		out2=c("22")
+	#	}
+	#	### select chromosomes now
+	#	#out2=c()
+	#	#types_now = d[which(d$donor_unique_id == input$donor),]
+	#	#types_now_chromo_type = types_now$type_chromo
+
+	#	#typ =c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events")
+	#	#if ( sum(types_now_chromo_type %in% typ)>0 ){
+	#	#	out2= types_now$Chr[ which(types_now$type_chromo %in% typ)]
+	#	#} else{ out2=c("22")}
+
+	#	return(list(out,out2))
+	#}
+
+	get_canc_types = function(d,input){
+		choices = sort(unique(d$histo[which(d$type_chromo %in% input$chromo_type)]))
+		#if (length(choices) == 0){ # we assume ther is always a valid choice (i.e. we have tumors for all categories of chromotype)
+		#}
+		return(choices)
+	}
+
 	output$cancer_type2 <- renderUI({
 		pickerInput('cancer_type2', 'Cancer type',
-					selected="Biliary-AdenoCA",
-					choices=sort(unique(d$histo[which(d$type_chromo %in% input$chromo_type)])),
+					selected="Bladder-TCC", #"Biliary-AdenoCA",
+					choices=get_canc_types(d,input), #sort(unique(d$histo[which(d$type_chromo %in% input$chromo_type)])),
 					options = list( `actions-box` = TRUE, `size`= 5, 
 								   style = "btn-info",
 								   `selected-text-format` = "count > 3" ), 
 					multiple = TRUE )
 	})
 
-
+	# get donors with the specified cancer types
 	get_with = function(d,input){
+		d$histo=as.vector(d$histo) #XX
 		out=c()
 		typ =c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events")
 		if ( sum(input$chromo_type %in% typ)>0 ){
 			typ_now = typ[which(typ %in% input$chromo_type)]
-			out = sort(unique(d$donor_unique_id[which(d$histo == input$cancer_type2 & d$type_chromo %in% typ_now)]))
+			#print(nrow(d))
+			#print(which(d$histo %in% input$cancer_type2 & d$type_chromo %in% typ_now))
+			out = sort(unique(d$donor_unique_id[which(d$histo %in% input$cancer_type2 & d$type_chromo %in% typ_now)]))
 		}
 		if ("No chromothripsis" %in% input$chromo_type){
-			now = d[which(d$histo == input$cancer_type2),]
-			now_sum = ddply(now,.(donor_unique_id),summarise,tot=sum(type_chromo!="No chromothripsis"))
-			now_sum = unique(now_sum$donor_unique_id[now_sum$tot==0])
+			now = d[which(d$histo %in% input$cancer_type2 & d$type_chromo %in% c("No chromothripsis") ),]
+			now_sum = ddply(now,.(donor_unique_id),summarise,tot=sum(type_chromo=="No chromothripsis",na.rm=T))
+			now_sum = unique(as.vector(now_sum$donor_unique_id[now_sum$tot==23]))
+			#now_sum = ddply(now,.(donor_unique_id),summarise,tot=sum(type_chromo!="No chromothripsis"))
+			#now_sum = unique(now_sum$donor_unique_id[now_sum$tot==0])
 			out =c(out, now_sum)
 		}
+#XXX create a global variable with the types of chromo at the moment y make the donor choice dependent on it with observe event.
+		#input3 <<- list(cancer_type=input$cancer_type2,typ = input$chromo_type, donor=input$donor,
+	#					donor=input$donor, chr_selection_circos=out,range_dist=input$range_dist, show_patho_indels = input$show_patho_indels, show_nopatho_indels =input$show_nopatho_indels, show_patho = input$show_patho, show_nopatho= input$show_nopatho, show_chromo_track=input$show_chromo_track, show_genes=input$show_genes)
 		return(out)
 	}
-	
 	output$donor_choice <- renderUI({
 		selectizeInput(multiple=F,'donor', 'Donor ID', 
 					   #get_with2(d,input)[[1]]
 					   get_with(d,input)
 					   )
 	})
+
+
 	###### get the chrs with chromothripsis in the selected tumor
+
 	get_chrs_with = function(d,input){
 		out=c()
-		types_now = d[which(d$donor_unique_id == input$donor),]
+		types_now = d[which(d$donor_unique_id == input$donor),] #& d$type_chromo %in% input$chromo_type & d$histo %in% input$cancer_type2),]
 		types_now_chromo_type = types_now$type_chromo
 
-		typ =c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events")
-		if ( sum(types_now_chromo_type %in% typ)>0 ){
-			out= types_now$Chr[ which(types_now$type_chromo %in% typ)]
+		typp =c("After polyploidization","Before polyploidization","Canonical without polyploidization","With other complex events")
+		if ( sum(types_now_chromo_type %in% typp)>0 ){
+			out= types_now$Chr[ which(types_now$type_chromo %in% typp)]
 		} else{ out=c("22")}
 		#update_circos <<- TRUE
-		input2 <<- list(donor=input$donor, chr_selection_circos=out,range_dist=input$range_dist, show_patho_indels = input$show_patho_indels, show_nopatho_indels =input$show_nopatho_indels, show_patho = input$show_patho, show_nopatho= input$show_nopatho, show_chromo_track=input$show_chromo_track, show_genes=input$show_genes)
+		input2 <<- list(#cancer_type=input$cancer_type2, 
+						#typ = input$chromo_type, 
+						donor=input$donor, 
+						chr_selection_circos=out,range_dist=input$range_dist, show_patho_indels = input$show_patho_indels, show_nopatho_indels =input$show_nopatho_indels, show_patho = input$show_patho, show_nopatho= input$show_nopatho, show_chromo_track=input$show_chromo_track, show_genes=input$show_genes)
 
 		return(out)
 	}
@@ -232,11 +333,26 @@ function(input, output, session) {
 	})
 
 	observeEvent(c(
-				   input$chr_selection_circos,input$range_dist,input$show_patho_indels, input$show_nopatho_indels,input$show_patho,input$show_nopatho,input$show_chromo_track,input$show_genes
+				   input$chr_selection_circos,input$range_dist,input$show_patho_indels, input$show_nopatho_indels,input$show_patho,input$show_nopatho,input$show_chromo_track,input$show_genes, input$donor # ,input$cancer_type2,input$chromo_type #,  input$donor,input$chromo_type ### XXXX input$donor added input$donor input$cancer_type2,
 				   ), { output$biocirc <- renderBioCircos({
 				   plot_biocirc(input2,input)#$chrs_selection_circos)
 				   })
 } )
+
+	#---------------------------------------------------------------
+#	output$cols_to_show <- 
+#		renderUI({
+#                                pickerInput('cols_to_show', 'Select chromosomes',
+#                                            selected=as.character(c(1:22,"X")), ##c("1"),#get_chrs_with(d,input), ##input2$chr_selection_circos , ##coas.character(c(1:22,"X")),
+#                                            choices=as.character(c(1:22,"X")),
+#                                            options = list( `actions-box` = F, `size`= 5,
+#                                                            style = "btn-info",
+#                                                            `selected-text-format` = "count > 3" ),
+#                                            multiple = TRUE )
+#	})
+
+
+
 
 	output$mytable2 <- DT::renderDataTable({
 		DT::datatable(selectedData_all_chrs(), style = 'bootstrap') %>% formatStyle(
@@ -335,6 +451,9 @@ function(input, output, session) {
 		out[,4] = factor(out[,4])
 		out[,5] = factor(out[,5])
 		out[,6] = factor(out[,6])
+
+
+
 		names(out)[1:2] = c("Cancer type","Chromothripsis in chromosome?") #Confidence of the chromothripsis call")
 		rownames(out)=NULL
 		return(out)
@@ -495,3 +614,94 @@ function(input, output, session) {
 	})
 
 }
+
+
+
+
+
+
+#library(ggplot2)
+#library(DT)
+#library(BioCircos)
+#library(shiny)
+#library(shinyWidgets)
+#source("biocircos_plots.R")
+#colours_ICGC= read.table("ICGC_colours_2.txt",sep="\t",header=F,stringsAsFactors = F,comment.char="")
+#d$colour_ICGC = colours_ICGC$V2[match(d$histo,colours_ICGC$V1)]
+#
+#function(input, output, session) {
+#	choices_cancer = sort(unique(d$histo)) 
+#
+#	observe({
+#		output$cancer_type <- renderUI({
+#			selectizeInput(multiple=T,'donor', 'Donor ID', choices_cancer)
+#		})
+#	})
+#
+#
+#	defaultColors = colours_ICGC$V2
+#
+#	series <- structure(
+#						lapply(defaultColors, function(color) { list(color=color) }),
+#						names = colours_ICGC$V1
+#						)
+#	yearData <- reactive({
+#		idx = which(d$purity >= input$purity & d$ploidy >= input$ploidy & d$histo %in% input$cancer_type & 
+#					d$Chr %in% input$chrom)
+#		all_cases=d[idx,]
+#		df = unique(d[idx, c("donor_unique_id","purity","ploidy","histo","SVs in sample","donor_age_at_diagnosis")])
+#
+#		## second data frame 
+#		idx2 = which(d$purity >= input$purity & d$ploidy >= input$ploidy & d$histo %in% input$cancer_type &
+#					 d$Chr %in% input$chrom & 
+#					 d[,"Nb. oscillating CN"] >= input$oscil2 & d$ratio >= input$fraction_SVs_chromo)
+#
+#		d$donor_chr = paste(d$donor_unique_id, "; chromosome ",d$Chr,sep="")
+#		df2 = unique(d[idx2, c("donor_chr","ratio","Nb. oscillating CN","histo","SVs in sample","Chr","donor_age_at_diagnosis")])
+#		names(df2) = c("donor_chr","Fraction of SVs in the tumor involved in chromothripsis and mapped to this chr","Nb. oscillating CN between 2 states","cancer type","SVs in sample","Chr","donor_age_at_diagnosis")
+#		names(df)[4] = names(df2)[4] = "Cancer type"
+#		return(list(df,df2,all_cases))
+#	})
+#
+#
+#	output$chart <- reactive({
+#		# Return the data and options
+#		list(
+#			 data = googleDataTable(yearData()[[1]]),
+#			 options = list(
+#							title = "Purity vs. ploidy",
+#							series = series
+#							)
+#			 )
+#	})
+#
+#	output$chart2 <- reactive({
+#		list(
+#			 data = googleDataTable(data=yearData()[[2]]),
+#			 options = list(
+#							title = "Fraction of SVs involved in chromothripsis vs uninterrupted CN oscillations",
+#							series = series
+#							)
+#			 )
+#	})
+
+#
+#	# Combine the selected variables into a new data frame
+#	selectedData <- reactive({
+#		d[which(d$donor_unique_id == input$donor & d$Chr == input$chromosome),]
+#	})
+#
+#	selectedData_donor_info <- reactive({
+#		out = unique(clinical[which(clinical$donor_unique_id == input$donor),])
+#		out = t(unique(out))
+#		colnames(out)="Value"
+#		return(out)
+#	})
+#
+#	selectedData_all_chrs <- reactive({
+#		out = d[which(d$donor_unique_id == input$donor & d$Chr %in% input$cols_to_show),]
+#
+
+
+
+

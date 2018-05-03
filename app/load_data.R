@@ -1,5 +1,6 @@
 
 calls_all = readRDS("calls_all_with_all_info_server.rds")
+calls_all=readRDS("calls_all_with_all_info_server_w_fn.rds")
 #calls_all = readRDS("calls_all_with_all_info.rds")
 d = calls_all
 d$SV_sample = d['SV calls file']
@@ -85,3 +86,6 @@ clinical$percentage_cellularity <- NULL
 clinical$project_code <- NULL
 clinical$donor_wgs_included_excluded = NULL
 names(clinical)[1]="donor_unique_id"
+
+
+print("comment" %in% names(d))
