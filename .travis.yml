@@ -1,15 +1,12 @@
-# Docker on Travis requires sudo.
-sudo: required
-
 script:
   # build new docker images on push
-  - sudo docker login -u $DOCKER_USER -p $DOCKER_PASS
-  - sudo sh build_image.sh
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - sh build_image.sh
 
 after_success:
   - REPO=scottx611x/chromothripsis-pcawg
-  - IMAGE=`sudo docker ps --latest --format '{{ .Image }}'` # TODO: with more containers, can't rely on ordering
-  - tag_push() { echo "Tagging into $2"; sudo docker tag $1 $2; sudo docker push $2; }
+  - IMAGE=`docker ps --latest --format '{{ .Image }}'` # TODO: with more containers, can't rely on ordering
+  - tag_push() { echo "Tagging into $2"; docker tag $1 $2; docker push $2; }
 
   # Always update "latest": the cache will be used for the next build.
   - tag_push $IMAGE $REPO
@@ -26,3 +23,7 @@ after_success:
         tag_push $IMAGE $REPO:$TRAVIS_TAG;
         tag_push $IMAGE $REPO:latest;
       fi
+env:
+  global:
+    - secure: "JmmGmWIa0dNUEZ26O7HmhIQFFkBb92fYjSBjgJi3pGFywe0gYQBpwuQpij69Zh/1g/h69AElJm+IfvdLXn8C1xLoo+5KwZATyzePdQ7sx6o2ypU3jiGGas4LN97xGbpJFz0lsNYJeQWa7nKMtI49aTqc46NQbJieikBB3foM9sqZXpX0w2DFWwFfAYkplI/iZ4JATLK+q61PlNwXgwMm3wYbVpXdkcsJEpWE3yxQtxQL4lsW8CeZXuGCsyr6E35253uPwcMjN4uNeXMeRcVuDUccKcQpXsjKZD7RkX1UEE2cfCf0hyDRH8RP4NxAoh9Le5i94cTtLjnR+hVOSTrYgrMW/UcOo0/21btCHBYbk8lrq6AEbAw6oN61/LP+orwqv2W3zQ83PbpqjfMVS8IxAiLmmAoIwqS3q/KKR3QKVAorNlnDcWt/XTelwXDnUEkNqrwM47nGU6s07uKeerUmTUXIeLcrp5aGjxveRuya1DVOohIYgdaxBGp0vSkq/EjMlg5Uq217fLY3Kz3EkKqkfeX6/1Iavvm5N38fUjfBpDc3zPPWrVNnnUJBiDlF3AHisw4HtN9myQLWBHaDyS05Zy/paeLtTiZgcxFU/oP/vwNRr5juxxi6HVCyzjdPeC4HJevbB4S7qQNfogzVOHYW5XHF8y/F/hYM/rg5O4V2XA8="
+    - secure: "iyvFU+jjWAwJtuODkrt6n7EdxYtM4JSWsGBCg3uuvkVYX7Ufk7XEVgHu6QumFCrVlQINLHMkXGJXwZzSx7klayKPoE+JEeN0FjyvSLFWc/2WoPRbZWl5a2ydQL5Yb/AFOXezXQXTQCCdgkAN1e9rXscP7zTdi9hDDZ3bY0h3BXTP4CEl3lKyOUQ3FF2++iAXtutsSRm3jCMiA9dX5DIwuF0jZFE7O3pzAKy3lc/6rMLfyWdSJgTbtaQhBBdAJiSY+W5WF5pk4E5UUsN6Wx+wLNQx94NJIaHc5ITx8em1KP8alR8HrJ6IrzSpJQdAb8xVef5y/KnZ1XNlV7nc5ximZ8VcKedeRh8ZImAKiuChOkmuK34OUgtDZ0VFmRyZix8oZbpvIN6eZsdzqgxApnP1hK+MEP00ZQOmWIB5etOADAFC6umQTyMMHRsQja95f4250w0L6JG4mM9Jv+Vud6JktD1/njQS31Z08AqWaN8WVAFmGaNAhWQ1LF0tCj4eump1oFCfrswMDbE7Oi8GbJRyTvwyFJ3CIQ2isXF3yVf3r6JqRCWPG05wXnNlV+Vh8rqZ3x+eWMBTOJ733DhpluFo0Jya5TOT7/4IonjJJZxky3UVXPFcle2tr6cegG5UBF9q3EjA3B8Giv9kjFY8IYgkZV1l9TTXHpeDf/d6QW2mk/8="
