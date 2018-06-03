@@ -15,7 +15,7 @@ library(shinydashboard)
 
 choices_cancer = sort(unique(d$histo)) 
 shinyUI(
-		fluidPage(title="Chromothripsis PCAWG",theme = shinytheme("sandstone"), 
+		fluidPage(title="Chromothripsis PCAWG", theme = shinytheme("sandstone"), 
 				  tags$link(
 							rel = "stylesheet", 
 							href="http://fonts.googleapis.com/css?family=Open+Sans"
