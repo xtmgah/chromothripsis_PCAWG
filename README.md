@@ -42,7 +42,7 @@
    SetEnv proxy-nokeepalive 1
 ```  
 - Docker container w/ run command: 
-    + `sudo docker run --rm -d -p 80:3242 -v /var/log/chromothripsis_pcawg_logs/:/var/log/shiny-server/ scottx611x/chromothripsis-pcawg`
+    + `sudo docker run --restart always -d -p 80:3242 -v /var/log/chromothripsis_pcawg_logs/:/var/log/shiny-server/ scottx611x/chromothripsis-pcawg`
 
 ### To-Do:
 - [ ] Basic tests ( `/` -> `200`)
