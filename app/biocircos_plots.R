@@ -8,6 +8,7 @@ cols_muts = c("#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf
 nucle = data.frame(mut_type=nucle,
 				   color=as.vector(cols_muts))
 
+
 genome = list("1" = 249250621, #Hg19
 			  "2" = 243199373,
 			  "3" = 198022430,
