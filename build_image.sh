@@ -11,7 +11,7 @@ CONTAINER_NAME="container-$STAMP$SUFFIX"
 mkdir "/tmp/$CONTAINER_NAME"
 
 docker pull $REPO # Defaults to "latest", but just speeds up the build, so precise version doesn't matter.
-docker build --cache-from $REPO \
+docker build --cache-from $REPO:latest \
              --tag image-$STAMP \
              .
 docker run --name $CONTAINER_NAME \
