@@ -2,8 +2,8 @@ script:
   # Build new docker images on push
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
   
-  # Wait 20 mins for image creation
-  - travis_wait sh build_image.sh
+  # Wait 30 mins for image creation
+  - travis_wait 30 sh build_image.sh
 
 after_success:
   - REPO=scottx611x/chromothripsis-pcawg
