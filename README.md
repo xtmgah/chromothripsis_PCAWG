@@ -24,7 +24,7 @@
 ### Deployment:
 - AWS m5.large instance
 - Accessible at: http://compbio.med.harvard.edu/chromothripsis
-- Compbio providing http/ws proxy in `/etc/apache2/sites-available/compbio.med.harvard.edu.conf` to AWS instance:
+- `compbio.med.harvard.edu` providing http/ws proxy in `/etc/apache2/sites-available/compbio.med.harvard.edu.conf` to AWS instance
 - Apache Proxy Config:
 ```
    Define chromothripsis_host <hostname>
